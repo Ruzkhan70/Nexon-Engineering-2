@@ -473,7 +473,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-4xl md:text-7xl font-black text-white mb-4 md:mb-6 tracking-tighter leading-[0.9] uppercase italic"
           >
-            {siteSettings.heroTitle.split(' ').map((word: string, i: number) => (
+            {(siteSettings?.heroTitle || "Engineering innovation with precision").split(' ').map((word: string, i: number) => (
               <span 
                 key={i} 
                 className={`inline-block pr-2 ${['engineering', 'innovation', 'precision'].includes(word.toLowerCase()) 
@@ -492,7 +492,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.7 }}
             className="text-[#E1F5FE]/60 text-base md:text-lg max-w-3xl mx-auto mb-8 md:mb-10 leading-relaxed font-medium italic"
           >
-            {siteSettings.heroSubtitle}
+            {siteSettings?.heroSubtitle || "Real repair maintenance and automation solutions delivered with unparalleled excellence across Sri Lanka"}
           </motion.p>
 
           <motion.div 
@@ -615,11 +615,11 @@ export default function Home() {
                 <span className="text-[#1E88E5] font-black tracking-[0.4em] uppercase text-[10px]">Registry: NXN-SRL-01</span>
                 <div className="flex-grow h-[1px] bg-[#0A2463]/10" />
               </div>
-              <h2 className="text-6xl md:text-8xl font-black leading-[0.85] tracking-tighter text-[#131313] uppercase italic">{siteSettings.aboutTitle}</h2>
+              <h2 className="text-6xl md:text-8xl font-black leading-[0.85] tracking-tighter text-[#131313] uppercase italic">{siteSettings?.aboutTitle || "Built on Trust."}</h2>
             </div>
             
             <p className="text-xl text-[#0A2463]/70 font-medium leading-relaxed italic pr-12">
-              {siteSettings.aboutText}
+              {siteSettings?.aboutText || "Nexon Engineering is a trusted provider of industrial repair, maintenance, and automation services."}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8">

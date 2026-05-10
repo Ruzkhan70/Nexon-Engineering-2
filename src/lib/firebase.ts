@@ -4,18 +4,31 @@ import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseAppletConfig from '../../firebase-applet-config.json';
 
 // Use environment variables if available (Vercel), otherwise fallback to the applet config (AI Studio)
+// Also ensure we don't crash if these objects are partially missing
+const safeConfig = (firebaseAppletConfig as any) || {};
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || firebaseAppletConfig.apiKey,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || firebaseAppletConfig.authDomain,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || firebaseAppletConfig.projectId,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || firebaseAppletConfig.storageBucket,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseAppletConfig.messagingSenderId,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || firebaseAppletConfig.appId,
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || (firebaseAppletConfig as any).databaseURL,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || safeConfig.apiKey || "",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || safeConfig.authDomain || "",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || safeConfig.projectId || "",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || safeConfig.storageBucket || "",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || safeConfig.messagingSenderId || "",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || safeConfig.appId || "",
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || safeConfig.databaseURL || "",
 };
 
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, import.meta.env.VITE_FIREBASE_DATABASE_ID || (firebaseAppletConfig as any).firestoreDatabaseId);
+let app;
+try {
+  app = initializeApp(firebaseConfig);
+} catch (e) {
+  console.error("Firebase App initialization failed. Check your config.", e);
+  // Re-init with dummy to prevent downstream crashes if possible, 
+  // though real initialization is required for functionality.
+  app = initializeApp({ apiKey: "invalid", projectId: "invalid" });
+}
+
+const dbId = import.meta.env.VITE_FIREBASE_DATABASE_ID || safeConfig.firestoreDatabaseId;
+export const db = getFirestore(app, (dbId === "default" || !dbId) ? undefined : dbId);
 export const auth = getAuth(app);
 
 export enum OperationType {

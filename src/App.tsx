@@ -71,14 +71,21 @@ export default function App() {
       if (doc.exists()) {
         setSettings(doc.data());
       }
-      // Ensure loading screen stays at least 2 seconds for smooth transition
-      setTimeout(() => setLoading(false), 2000);
+      setLoading(false);
     }, (error) => {
       console.warn("Initial settings sync restricted, initializing system shell.");
       setLoading(false);
     });
 
-    return () => unsub();
+    // Safety timeout: Ensure loading finishes even if Firebase hangs indefinitely
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+
+    return () => {
+      unsub();
+      clearTimeout(safetyTimeout);
+    };
   }, []);
 
   return (
