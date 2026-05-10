@@ -1,0 +1,297 @@
+{
+  "entities": {
+    "SiteSettings": {
+      "title": "Site Settings",
+      "description": "Global configuration and content for the website",
+      "type": "object",
+      "properties": {
+        "heroTitle": { "type": "string" },
+        "heroSubtitle": { "type": "string" },
+        "aboutText": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "featuresEnabled": {
+          "type": "object",
+          "properties": {
+            "reviews": { "type": "boolean" },
+            "projects": { "type": "boolean" },
+            "services": { "type": "boolean" },
+            "clients": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "Service": {
+      "title": "Service",
+      "description": "Industrial services offered by NEXON",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "icon": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "category": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "description", "enabled"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Industrial project portfolio item",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "fullDescription": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "gallery": { 
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": { "type": "string" },
+              "caption": { "type": "string" }
+            }
+          }
+        },
+        "category": { "type": "string" },
+        "client": { "type": "string" },
+        "year": { "type": "string" },
+        "location": { "type": "string" },
+        "status": { "type": "string", "enum": ["ongoing", "completed"] },
+        "features": { 
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "challenges": { "type": "string" },
+        "solutions": { "type": "string" }
+      },
+      "required": ["title", "category", "status"]
+    },
+    "Client": {
+      "title": "Client",
+      "description": "Partnering clients",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "websiteUrl": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["name", "logoUrl"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Customer reviews and testimonials",
+      "type": "object",
+      "properties": {
+        "author": { "type": "string" },
+        "content": { "type": "string" },
+        "rating": { "type": "number" },
+        "date": { "type": "string" },
+        "avatarUrl": { "type": "string" },
+        "approved": { "type": "boolean" }
+      },
+      "required": ["author", "content", "rating"]
+    },
+    "Message": {
+      "title": "Project Transmission",
+      "description": "Unified project request data structure supporting legacy and matrix workflows",
+      "type": "object",
+      "properties": {
+        "customerName": { "type": "string" },
+        "customerEmail": { "type": "string" },
+        "customerGoal": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "message": { "type": "string" },
+        "subject": { "type": "string" },
+        "aiAnalysis": { "type": "object" },
+        "isMatrixRequest": { "type": "boolean" },
+        "timestamp": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "status": { "type": "string", "enum": ["new", "in_progress", "completed"] },
+        "read": { "type": "boolean" }
+      },
+      "required": ["timestamp", "status"]
+    },
+    "ServiceCategory": {
+      "title": "Service Category",
+      "description": "Categories for industrial services",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "order": { "type": "number" },
+        "enabled": { "type": "boolean" }
+      },
+      "required": ["name", "enabled"]
+    },
+    "ProjectCategory": {
+      "title": "Project Category",
+      "description": "Categories for portfolio projects",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "order": { "type": "number" },
+        "enabled": { "type": "boolean" }
+      },
+      "required": ["name", "enabled"]
+    },
+    "Session": {
+      "title": "Active Session",
+      "description": "Tracks active admin sessions for security and remote logout",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "email": { "type": "string" },
+        "userAgent": { "type": "string" },
+        "deviceType": { "type": "string" },
+        "deviceId": { "type": "string" },
+        "lastActive": { "type": "string" },
+        "loginTime": { "type": "string" }
+      },
+      "required": ["userId", "email", "lastActive", "loginTime"]
+    },
+    "FailedLogin": {
+      "title": "Failed Login Attempt",
+      "description": "Logs failed login attempts for security monitoring",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "password": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "ip": { "type": "string" },
+        "userAgent": { "type": "string" }
+      },
+      "required": ["email", "timestamp"]
+    },
+    "ActivityLog": {
+      "title": "Activity Log",
+      "description": "System-wide tracking of admin actions",
+      "type": "object",
+      "properties": {
+        "adminEmail": { "type": "string" },
+        "action": { "type": "string" },
+        "targetId": { "type": "string" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["adminEmail", "action", "targetId", "timestamp"]
+    },
+    "VerificationCode": {
+      "title": "Verification Code",
+      "description": "Short-lived codes for high-security operations",
+      "type": "object",
+      "properties": {
+        "adminEmail": { "type": "string" },
+        "code": { "type": "string" },
+        "expiresAt": { "type": "number" },
+        "used": { "type": "boolean" },
+        "purpose": { "type": "string" }
+      },
+      "required": ["adminEmail", "code", "expiresAt", "used"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "System notifications and background job tracking",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "targetEmail": { "type": "string" },
+        "sourceMessageId": { "type": "string" },
+        "status": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["type", "status", "timestamp"]
+    },
+    "Sector": {
+      "title": "Industrial Sector",
+      "description": "Market vertical served by NEXON",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "icon": { "type": "string" },
+        "color": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "enabled"]
+    },
+    "CoverageArea": {
+      "title": "Technical Coverage Node",
+      "description": "Operational reach and specialized hubs",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "labs": { "type": "string" },
+        "focus": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "enabled"]
+    }
+  },
+  "firestore": {
+    "settings/global": {
+      "schema": "SiteSettings",
+      "description": "Global site configuration"
+    },
+    "services/{serviceId}": {
+      "schema": "Service",
+      "description": "Individual services"
+    },
+    "serviceCategories/{categoryId}": {
+      "schema": "ServiceCategory",
+      "description": "Categories for services"
+    },
+    "projects/{projectId}": {
+      "schema": "Project",
+      "description": "Portfolio projects"
+    },
+    "projectCategories/{categoryId}": {
+      "schema": "ProjectCategory",
+      "description": "Categories for projects"
+    },
+    "clients/{clientId}": {
+      "schema": "Client",
+      "description": "Clients and partners"
+    },
+    "reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "User reviews"
+    },
+    "messages/{messageId}": {
+      "schema": "Message",
+      "description": "Contact form submissions"
+    },
+    "sessions/{sessionId}": {
+      "schema": "Session",
+      "description": "Active admin sessions"
+    },
+    "failed_logins/{attemptId}": {
+      "schema": "FailedLogin",
+      "description": "Failed login logs"
+    },
+    "activity_logs/{logId}": {
+      "schema": "ActivityLog",
+      "description": "Audit trail of admin actions"
+    },
+    "verification_codes/{codeId}": {
+      "schema": "VerificationCode",
+      "description": "Codes for sensitive admin actions"
+    },
+    "notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "System event notifications"
+    },
+    "sectors/{sectorId}": {
+      "schema": "Sector",
+      "description": "Market verticals"
+    },
+    "coverageAreas/{areaId}": {
+      "schema": "CoverageArea",
+      "description": "Technical coverage network"
+    }
+  }
+}

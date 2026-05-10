@@ -1,0 +1,10 @@
+{
+  "projectId": "nexon-admin",
+  "appId": "1:641077732544:web:6000a67fa448fc188bb925",
+  "apiKey": "AIzaSyDmK7a4cAoFHT2fNlnt_0MerotKEYLkQIU",
+  "authDomain": "nexon-admin.firebaseapp.com",
+  "storageBucket": "nexon-admin.firebasestorage.app",
+  "messagingSenderId": "641077732544",
+  "measurementId": "",
+  "databaseURL": "https://nexon-admin-default-rtdb.firebaseio.com"
+}

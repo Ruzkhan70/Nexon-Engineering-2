@@ -1,0 +1,126 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- Global Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      // Hardcoded Admin List with lower-case normalization
+      let adminEmails = [
+        'nexonengineering.service@gmail.com',
+        'ruzkaanjawahir07@gmail.com',
+      ];
+      return isSignedIn() && (
+        (request.auth.token.get('email', '').lower() in adminEmails) ||
+        (request.auth.uid == 'NII789XEcDU2yJ3BpJdGJisNXyA2')
+      );
+    }
+
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+
+    function isValidReview(data) {
+      return data.keys().hasAll(['author', 'content', 'rating']) &&
+             data.author is string && data.author.size() <= 100 &&
+             data.content is string && data.content.size() <= 1000 &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5;
+    }
+
+    function isValidMessage(data) {
+      return data.keys().hasAll(['name', 'email', 'message']) &&
+             data.name is string && data.name.size() <= 100 &&
+             data.email is string && data.email.size() <= 100 &&
+             data.message is string && data.message.size() <= 2000;
+    }
+
+    function isValidVerificationCode(data) {
+      return data.keys().hasAll(['adminEmail', 'code', 'expiresAt', 'used', 'purpose']) &&
+             data.adminEmail is string && data.code is string &&
+             data.expiresAt is number && data.used is bool &&
+             data.purpose is string;
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll(['type', 'status', 'timestamp']) &&
+             data.type is string && data.status is string &&
+             data.timestamp is string;
+    }
+
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Monitoring & Security ---
+    
+    match /sessions/{sessionId} {
+      allow read: if isAdmin() || (isSignedIn() && existing().userId == request.auth.uid);
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid && isValidId(sessionId);
+      allow delete: if isAdmin() || (isSignedIn() && existing().userId == request.auth.uid);
+      allow update: if (isSignedIn() && existing().userId == request.auth.uid && 
+                       incoming().diff(existing()).affectedKeys().hasOnly(['lastActive']))
+                   || isAdmin();
+    }
+
+    match /failed_logins/{attemptId} {
+      allow read, delete: if isAdmin();
+      allow create: if isValidId(attemptId);
+    }
+
+    match /activity_logs/{logId} {
+      allow read, list: if isAdmin();
+      allow create: if isAdmin() && isValidId(logId);
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // --- Content Management ---
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(docId);
+      allow update: if (docId == 'global' && incoming().diff(existing()).affectedKeys().hasOnly(['visitorCount']))
+                   || isAdmin();
+    }
+
+    match /services/{id} { allow read: if true; allow write: if isAdmin() && isValidId(id); }
+    match /serviceCategories/{id} { allow read: if true; allow write: if isAdmin() && isValidId(id); }
+    match /projects/{id} { allow read: if true; allow write: if isAdmin() && isValidId(id); }
+    match /projectCategories/{id} { allow read: if true; allow write: if isAdmin() && isValidId(id); }
+    match /clients/{id} { allow read: if true; allow write: if isAdmin() && isValidId(id); }
+    match /sectors/{id} { allow read: if true; allow write: if isAdmin() && isValidId(id); }
+    match /coverageAreas/{id} { allow read: if true; allow write: if isAdmin() && isValidId(id); }
+    match /reviews/{id} { 
+      allow read: if true; 
+      allow create: if isValidReview(incoming()) && isValidId(id); 
+      allow update, delete: if isAdmin(); 
+    }
+    match /messages/{id} { 
+      allow read, update, delete: if isAdmin(); 
+      allow create: if isValidMessage(incoming()) && isValidId(id); 
+    }
+
+    match /notifications/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if isValidNotification(incoming()) && isValidId(id);
+    }
+    
+    match /admins/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /verification_codes/{codeId} {
+      // Only admins can request codes
+      allow create: if isAdmin() && isValidVerificationCode(incoming()) && isValidId(codeId);
+      // Admins can lookup a code by its document ID to verify it
+      allow read: if isAdmin();
+      // Codes are single-use
+      allow update: if isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly(['used']);
+      allow delete: if isAdmin();
+    }
+  }
+}
