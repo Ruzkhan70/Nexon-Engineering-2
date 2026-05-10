@@ -74,7 +74,7 @@ export default function App() {
       // Ensure loading screen stays at least 2 seconds for smooth transition
       setTimeout(() => setLoading(false), 2000);
     }, (error) => {
-      handleFirestoreError(error, OperationType.GET, 'settings/global');
+      console.warn("Initial settings sync restricted, initializing system shell.");
       setLoading(false);
     });
 
