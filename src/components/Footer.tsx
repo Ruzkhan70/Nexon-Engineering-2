@@ -5,23 +5,16 @@ import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import logoAsset from '../assets/images/regenerated_image_1778416445692.png';
 
-export default function Footer() {
+export default function Footer({ settings }: { settings: any }) {
   const location = useLocation();
 
-  const [siteSettings, setSiteSettings] = useState<any>({
+  const siteSettings = settings || {
     footerAddress: 'WVP9+FGX, Colombo 01000, Colombo 10, Sri Lanka',
     footerPhone: '+94 77 375 3621',
-    footerEmail: 'nexonengineering.service@gmail.com'
-  });
-
-  useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'settings', 'global'), (doc) => {
-      if (doc.exists()) {
-        setSiteSettings(doc.data() as any);
-      }
-    }, (error) => handleFirestoreError(error, OperationType.GET, 'settings/global'));
-    return () => unsub();
-  }, []);
+    footerEmail: 'nexonengineering.service@gmail.com',
+    showFacebook: true,
+    showGoogleMaps: true
+  };
 
   if (location.pathname === '/admin') return null;
 

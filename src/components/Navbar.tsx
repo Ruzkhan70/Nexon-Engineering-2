@@ -22,9 +22,9 @@ export default function Navbar({ settings }: { settings: any }) {
   const navLinks = [
     { name: 'Home', path: '/', enabled: true },
     { name: 'About', path: '/about', enabled: true },
-    { name: 'Services', path: '/services', enabled: settings ? settings.featureServices : false },
-    { name: 'Projects', path: '/projects', enabled: settings ? settings.featureProjects : false },
-    { name: 'Clients', path: '/clients', enabled: settings ? settings.featureClients : false },
+    { name: 'Services', path: '/services', enabled: settings ? settings.featureServices !== false : true },
+    { name: 'Projects', path: '/projects', enabled: settings ? settings.featureProjects !== false : true },
+    { name: 'Clients', path: '/clients', enabled: settings ? settings.featureClients !== false : true },
     { name: 'Contact', path: '/contact', enabled: true },
   ].filter(link => link.enabled);
 

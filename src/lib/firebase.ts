@@ -19,24 +19,30 @@ const firebaseConfig = {
 
 // Debug: Log config status (masked)
 if (import.meta.env.PROD) {
-  console.log("Firebase initializing in production mode...");
-  console.log("Config keys presence:", Object.fromEntries(
-    Object.entries(firebaseConfig).map(([k, v]) => [k, !!v])
-  ));
+  console.log("Firebase initializing...");
+  const missingKeys = Object.entries(firebaseConfig)
+    .filter(([k, v]) => !v && k !== 'databaseURL' && k !== 'databaseId')
+    .map(([k]) => k);
+  
+  if (missingKeys.length > 0) {
+    console.warn("⚠️ Firebase configuration is partial. Missing keys:", missingKeys);
+    console.info("Please ensure VITE_FIREBASE_API_KEY, VITE_FIREBASE_PROJECT_ID, etc. are set in your deployment environment.");
+  } else {
+    console.log("✅ Firebase configuration keys detected.");
+  }
 }
 
 let app;
 try {
-  // Only attempt to init if we have at least an API key and project ID
-  if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+  // Only attempt to init if we have a plausible API key and project ID
+  if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "missing-key" && firebaseConfig.projectId) {
     app = initializeApp(firebaseConfig);
   } else {
-    throw new Error("Missing critical Firebase configuration keys.");
+    throw new Error("Missing critical Firebase configuration keys (API Key or Project ID).");
   }
 } catch (e) {
-  console.error("Firebase App initialization failed. Check your environment variables.", e);
+  console.error("Firebase App initialization failed.", e);
   // Re-init with dummy to prevent downstream crashes, but this won't work for real queries
-  // We use a dummy project ID that won't match any real one
   app = initializeApp({ apiKey: "invalid-key-placeholder", projectId: "invalid-project-placeholder" });
 }
 
@@ -87,8 +93,10 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     operationType,
     path
   }
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
+  console.error('[Nexon Matrix Error]: ', JSON.stringify(errInfo));
+  // We do not throw here to prevent crashing the React component tree
+  // This allows the app to fallback to local 'Demo Mode' data
+  return errInfo;
 }
 
 // Connectivity check

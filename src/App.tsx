@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { AlertTriangle } from 'lucide-react';
@@ -54,7 +54,7 @@ function AppContent({ settings, loading }: { settings: any, loading: boolean }) 
                 </motion.div>
               </AnimatePresence>
             </main>
-            <Footer />
+            <Footer settings={settings} />
           </div>
         )}
       </div>
@@ -67,27 +67,37 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [timedOut, setTimedOut] = useState(false);
 
+  const loadingRef = useRef(true);
+
   useEffect(() => {
-    // High-level settings sync to prevent flashing
+    // High-level settings sync
     const unsub = onSnapshot(doc(db, 'settings', 'global'), (doc) => {
       if (doc.exists()) {
         setSettings(doc.data());
       }
       setLoading(false);
+      loadingRef.current = false;
     }, (error) => {
       console.warn("Initial settings sync restricted, initializing system shell.");
       setLoading(false);
+      loadingRef.current = false;
     });
 
-    // Safety timeout: Ensure loading finishes even if Firebase hangs indefinitely
+    // Safety timeout: Ensure loading finishes after 4s no matter what
     const safetyTimeout = setTimeout(() => {
-      setLoading(false);
-    }, 5000);
+      if (loadingRef.current) {
+        console.log("Safety synchronization engaged.");
+        setLoading(false);
+        loadingRef.current = false;
+      }
+    }, 4000);
     
-    // Hard failure timeout: Show error UI if nothing works after 10s
+    // Hard failure timeout: Only show error if we are STILL loading after 15s
     const failureTimeout = setTimeout(() => {
-      if (loading) setTimedOut(true);
-    }, 10000);
+      if (loadingRef.current) {
+        setTimedOut(true);
+      }
+    }, 15000);
 
     return () => {
       unsub();
@@ -97,21 +107,12 @@ export default function App() {
   }, []);
 
   if (timedOut) {
-    return (
-      <div className="min-h-screen bg-[#020917] flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center text-rose-500 mb-6">
-          <AlertTriangle size={40} />
-        </div>
-        <h1 className="text-4xl font-black text-white mb-4 italic uppercase">System Offline</h1>
-        <p className="text-white/40 max-w-md mb-8 italic">The Nexon Matrix could not be established. Please check your network connection or contact system administration.</p>
-        <button onClick={() => window.location.reload()} className="px-8 py-4 bg-royal text-white rounded-full font-black uppercase tracking-widest text-sm">Synchronize</button>
-      </div>
-    );
+    console.warn("Nexon Matrix connection timed out. Bootstrapping local standby mode.");
   }
 
   return (
     <Router>
-      <AppContent settings={settings} loading={loading} />
+      <AppContent settings={settings} loading={loading && !timedOut} />
     </Router>
   );
 }
