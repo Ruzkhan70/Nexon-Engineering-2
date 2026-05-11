@@ -17,14 +17,27 @@ const firebaseConfig = {
   databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || safeConfig.databaseURL || "",
 };
 
+// Debug: Log config status (masked)
+if (import.meta.env.PROD) {
+  console.log("Firebase initializing in production mode...");
+  console.log("Config keys presence:", Object.fromEntries(
+    Object.entries(firebaseConfig).map(([k, v]) => [k, !!v])
+  ));
+}
+
 let app;
 try {
-  app = initializeApp(firebaseConfig);
+  // Only attempt to init if we have at least an API key and project ID
+  if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+    app = initializeApp(firebaseConfig);
+  } else {
+    throw new Error("Missing critical Firebase configuration keys.");
+  }
 } catch (e) {
-  console.error("Firebase App initialization failed. Check your config.", e);
-  // Re-init with dummy to prevent downstream crashes if possible, 
-  // though real initialization is required for functionality.
-  app = initializeApp({ apiKey: "invalid", projectId: "invalid" });
+  console.error("Firebase App initialization failed. Check your environment variables.", e);
+  // Re-init with dummy to prevent downstream crashes, but this won't work for real queries
+  // We use a dummy project ID that won't match any real one
+  app = initializeApp({ apiKey: "invalid-key-placeholder", projectId: "invalid-project-placeholder" });
 }
 
 const dbId = import.meta.env.VITE_FIREBASE_DATABASE_ID || safeConfig.firestoreDatabaseId;

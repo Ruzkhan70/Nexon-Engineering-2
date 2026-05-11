@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
+import { AlertTriangle } from 'lucide-react';
 import { db, handleFirestoreError, OperationType } from './lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import Navbar from './components/Navbar';
@@ -29,7 +30,7 @@ function AppContent({ settings, loading }: { settings: any, loading: boolean }) 
       
       <div className="min-h-screen flex flex-col bg-[#020917] text-[#F8F9FA] font-sans selection:bg-[#1E88E5] selection:text-white">
         {!loading && (
-          <>
+          <div className="flex flex-col min-h-screen">
             <Navbar settings={settings} />
             <main className="flex-grow min-h-screen relative">
               <AnimatePresence mode="wait">
@@ -40,7 +41,7 @@ function AppContent({ settings, loading }: { settings: any, loading: boolean }) 
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.4, ease: "easeInOut" }}
                 >
-                  <Routes location={location} key={location.pathname}>
+                  <Routes location={location}>
                     <Route path="/" element={<Home />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/services" element={<Services />} />
@@ -54,7 +55,7 @@ function AppContent({ settings, loading }: { settings: any, loading: boolean }) 
               </AnimatePresence>
             </main>
             <Footer />
-          </>
+          </div>
         )}
       </div>
     </>
@@ -64,6 +65,7 @@ function AppContent({ settings, loading }: { settings: any, loading: boolean }) 
 export default function App() {
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {
     // High-level settings sync to prevent flashing
@@ -81,12 +83,31 @@ export default function App() {
     const safetyTimeout = setTimeout(() => {
       setLoading(false);
     }, 5000);
+    
+    // Hard failure timeout: Show error UI if nothing works after 10s
+    const failureTimeout = setTimeout(() => {
+      if (loading) setTimedOut(true);
+    }, 10000);
 
     return () => {
       unsub();
       clearTimeout(safetyTimeout);
+      clearTimeout(failureTimeout);
     };
   }, []);
+
+  if (timedOut) {
+    return (
+      <div className="min-h-screen bg-[#020917] flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-20 h-20 bg-rose-500/20 rounded-full flex items-center justify-center text-rose-500 mb-6">
+          <AlertTriangle size={40} />
+        </div>
+        <h1 className="text-4xl font-black text-white mb-4 italic uppercase">System Offline</h1>
+        <p className="text-white/40 max-w-md mb-8 italic">The Nexon Matrix could not be established. Please check your network connection or contact system administration.</p>
+        <button onClick={() => window.location.reload()} className="px-8 py-4 bg-royal text-white rounded-full font-black uppercase tracking-widest text-sm">Synchronize</button>
+      </div>
+    );
+  }
 
   return (
     <Router>
