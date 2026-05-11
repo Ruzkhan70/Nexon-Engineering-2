@@ -1456,6 +1456,7 @@ function SiteContentEditor({ ImageDropzone, notify, askPermission }: { ImageDrop
     statClients: 30,
     statYears: 8,
     statSupport: 24,
+    statRepairs: 500,
     footerAddress: 'Colombo, Sri Lanka',
     footerPhone: '+94 77 123 4567',
     footerEmail: 'info@nexonengineering.com',
@@ -1477,6 +1478,10 @@ function SiteContentEditor({ ImageDropzone, notify, askPermission }: { ImageDrop
     projectsSubtitle: 'Witness our commitment to excellence through our most significant industrial milestones.',
     clientsSubtitle: 'Trusted by industry leaders across Sri Lanka for technical excellence and reliability.',
     contactSubtitle: 'Have a project in mind? Our team of experts is ready to help you with industrial repair, automation, and more.',
+    aboutValuesTitle: 'Technical Standards',
+    aboutValuesSubtitle: 'The fundamental principles that govern our technical execution and safety protocols.',
+    aboutTechnicalTitle: 'Operational NEXON',
+    aboutTechnicalSubtitle: 'Our expertise is partitioned into four primary technical domains, each monitored and executed by specialized Matrix engineers.',
     visitorCount: 0,
     showLinkedIn: true,
     showTwitter: true,
@@ -1836,7 +1841,8 @@ function SiteContentEditor({ ImageDropzone, notify, askPermission }: { ImageDrop
                         { id: 'statProjects', label: 'Projects' },
                         { id: 'statClients', label: 'Clients' },
                         { id: 'statYears', label: 'Exp Years' },
-                        { id: 'statSupport', label: 'Support (H)' }
+                        { id: 'statSupport', label: 'Support (H)' },
+                        { id: 'statRepairs', label: 'Repairs' }
                       ].map(stat => (
                         <div key={stat.id} className="space-y-2">
                           <label className="text-[10px] font-black uppercase tracking-widest text-[#1E88E5]">{stat.label}</label>
@@ -1876,6 +1882,35 @@ function SiteContentEditor({ ImageDropzone, notify, askPermission }: { ImageDrop
                             value={settings.aboutVision}
                             onChange={(v) => setSettings({...settings, aboutVision: v})}
                          />
+                       </div>
+
+                       <div className="grid md:grid-cols-2 gap-8 pt-6 border-t border-white/5">
+                          <div className="space-y-4">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-[#1E88E5]">Values Section Title</label>
+                            <input 
+                              className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-black text-white outline-none focus:border-[#1E88E5]"
+                              value={settings.aboutValuesTitle}
+                              onChange={(e) => setSettings({...settings, aboutValuesTitle: e.target.value})}
+                            />
+                            <AutoExpandingTextarea 
+                               label="Values Section Subtitle"
+                               value={settings.aboutValuesSubtitle}
+                               onChange={(v) => setSettings({...settings, aboutValuesSubtitle: v})}
+                            />
+                          </div>
+                          <div className="space-y-4">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-[#1E88E5]">Technical Domains Title</label>
+                            <input 
+                              className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xl font-black text-white outline-none focus:border-[#1E88E5]"
+                              value={settings.aboutTechnicalTitle}
+                              onChange={(e) => setSettings({...settings, aboutTechnicalTitle: e.target.value})}
+                            />
+                            <AutoExpandingTextarea 
+                               label="Technical Domains Subtitle"
+                               value={settings.aboutTechnicalSubtitle}
+                               onChange={(v) => setSettings({...settings, aboutTechnicalSubtitle: v})}
+                            />
+                          </div>
                        </div>
 
                        <div className="pt-10 border-t border-white/5 space-y-8">

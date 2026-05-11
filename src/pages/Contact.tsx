@@ -298,19 +298,8 @@ export default function Contact() {
                      />
                   </div>
 
-                  {siteSettings?.enableContactAttachments && (
-                    <div className="p-6 border border-white/5 bg-white/[0.02] rounded-3xl group/upload cursor-not-allowed">
-                        <div className="flex items-center gap-4 text-white/20">
-                            <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover/upload:border-royal/50 transition-colors">
-                              <Zap size={20} className="group-hover/upload:text-royal transition-colors" />
-                            </div>
-                            <div className="flex-grow">
-                               <div className="text-[10px] font-black uppercase tracking-widest mb-1">Technical Attachments</div>
-                               <div className="text-[9px] uppercase tracking-tighter opacity-40">CAD / Engineering Specs (Enabled in Priority Session)</div>
-                            </div>
-                        </div>
-                    </div>
-                  )}
+                  {/* Note: Technical attachments section removed as it is currently a decorative placeholder. 
+                      You can re-enable it when the secure schematic upload protocols are implemented. */}
 
                   <button 
                     type="submit"
@@ -354,7 +343,7 @@ export default function Contact() {
                 { title: "South Asia Reach", labs: "Remote Support", focus: "Regional Consultation & Technical Logistics" },
             ]).map((zone, i) => (
                 <motion.div 
-                    key={zone.title}
+                    key={zone.id || zone.title || i}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}

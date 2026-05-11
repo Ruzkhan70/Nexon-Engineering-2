@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { ExternalLink, Filter, Calendar, User, EyeOff, Boxes, Layers, ArrowUpRight, Cpu, Sparkles } from 'lucide-react';
+import { ExternalLink, Filter, Calendar, User, EyeOff, Boxes, Layers, ArrowUpRight, Cpu, Sparkles, Loader2 } from 'lucide-react';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, where, onSnapshot, doc, orderBy } from 'firebase/firestore';
 import MagneticButton from '../components/MagneticButton';
@@ -12,6 +12,7 @@ export default function Projects() {
   const [categories, setCategories] = useState<any[]>([]);
   const [siteSettings, setSiteSettings] = useState<any>(null);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +29,11 @@ export default function Projects() {
     const q = query(collection(db, 'projects'), where('enabled', '==', true));
     const unsubProjects = onSnapshot(q, (snap) => {
       setProjects(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    }, (error) => handleFirestoreError(error, OperationType.LIST, 'projects'));
+      setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'projects');
+      setLoading(false);
+    });
 
     return () => {
       unsubSettings();
@@ -107,7 +112,13 @@ export default function Projects() {
             </motion.p>
           </div>
 
-          <div className="flex flex-col items-end gap-8">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-10 gap-4">
+              <Loader2 className="text-royal animate-spin" size={40} />
+              <span className="text-white/20 font-black uppercase tracking-widest text-[10px]">Processing Project Matrix...</span>
+            </div>
+          ) : (
+            <div className="flex flex-col items-end gap-8">
              <div className="flex flex-wrap justify-end gap-3 p-1.5 glass-morphism rounded-[24px]">
                 {filterOptions.map((catId) => (
                   <button
@@ -140,10 +151,12 @@ export default function Projects() {
                 </div>
              </div>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Dynamic Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+      {siteSettings?.featureProjects !== false && !loading && (
+        <div className="max-w-7xl mx-auto px-8 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mt-16">
           <AnimatePresence mode="popLayout">
             {filteredProjects.map((project, idx) => {
               // Create a modular feel by varying column spans
@@ -240,8 +253,10 @@ export default function Projects() {
             })}
           </AnimatePresence>
         </div>
+      </div>
+    )}
 
-        {/* Large Footer CTA */}
+    {/* Large Footer CTA */}
         <motion.section 
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}

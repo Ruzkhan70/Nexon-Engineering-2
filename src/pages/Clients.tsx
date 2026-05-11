@@ -3,12 +3,13 @@ import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, where, onSnapshot, doc } from 'firebase/firestore';
-import { ExternalLink, Users, ArrowRight } from 'lucide-react';
+import { ExternalLink, Users, ArrowRight, Loader2 } from 'lucide-react';
 
 export default function Clients() {
   const [clients, setClients] = useState<any[]>([]);
   const [sectors, setSectors] = useState<any[]>([]);
   const [siteSettings, setSiteSettings] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -19,7 +20,11 @@ export default function Clients() {
     const qClients = query(collection(db, 'clients'), where('enabled', '==', true));
     const unsubClients = onSnapshot(qClients, (snap) => {
       setClients(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    }, (error) => handleFirestoreError(error, OperationType.LIST, 'clients'));
+      setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'clients');
+      setLoading(false);
+    });
 
     const qSectors = query(collection(db, 'sectors'), where('enabled', '==', true));
     const unsubSectors = onSnapshot(qSectors, (snap) => {
@@ -59,7 +64,7 @@ export default function Clients() {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-6xl md:text-[8rem] font-black text-white tracking-tighter leading-[0.85] mb-12 uppercase italic"
+            className="text-6xl md:text-[8rem] font-black text-white tracking-tighter leading-[0.85] mb-12 uppercase italic pr-4 md:pr-8"
           >
             OUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1E88E5] to-[#00b4d8]">CLIENTS</span>
           </motion.h1>
@@ -74,64 +79,70 @@ export default function Clients() {
           </motion.p>
         </div>
 
-        {/* Clients Grid Container */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 mb-32">
-          {clients.map((client, idx) => (
-            <motion.div
-              key={client.id}
-              onClick={() => {
-                if (client.websiteUrl) {
-                  window.open(client.websiteUrl, '_blank', 'noopener,noreferrer');
-                }
-              }}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.05 }}
-              whileHover={client.websiteUrl ? { y: -10, scale: 1.02 } : {}}
-              className={`group bg-white/5 border border-white/10 rounded-[50px] shadow-2xl flex flex-col hover:border-[#1E88E5]/30 transition-all duration-700 relative overflow-hidden h-full ${client.websiteUrl ? 'cursor-pointer' : 'cursor-default'}`}
-            >
-              {/* Image Container - Curve down the edge */}
-              <div className="w-full h-48 md:h-64 bg-white/5 p-8 md:p-12 flex items-center justify-center relative overflow-hidden border-b border-white/5 shadow-inner">
-                {/* Glow Ring */}
-                <div className="absolute inset-0 bg-[#1E88E5]/0 rounded-full blur-[40px] group-hover:bg-[#1E88E5]/10 transition-all duration-700" />
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-4">
+            <Loader2 className="text-royal animate-spin" size={40} />
+            <span className="text-white/20 font-black uppercase tracking-widest text-[10px]">Assembling Client Database...</span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 mb-32">
+            {clients.map((client, idx) => (
+              <motion.div
+                key={client.id || idx}
+                onClick={() => {
+                  if (client.websiteUrl) {
+                    window.open(client.websiteUrl, '_blank', 'noopener,noreferrer');
+                  }
+                }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.05 }}
+                whileHover={client.websiteUrl ? { y: -10, scale: 1.02 } : {}}
+                className={`group bg-white/5 border border-white/10 rounded-[50px] shadow-2xl flex flex-col hover:bg-white/[0.07] hover:border-[#1E88E5]/40 transition-all duration-700 relative overflow-hidden h-full ${client.websiteUrl ? 'cursor-pointer' : 'cursor-default'}`}
+              >
+                {/* Image Container - Curve down the edge */}
+                <div className="w-full h-48 md:h-64 bg-white/5 p-8 md:p-12 flex items-center justify-center relative overflow-hidden border-b border-white/5 shadow-inner">
+                  {/* Glow Ring */}
+                  <div className="absolute inset-0 bg-[#1E88E5]/0 rounded-full blur-[60px] group-hover:bg-[#1E88E5]/20 transition-all duration-1000" />
+                  
+                  <img 
+                    src={client.logoUrl || client.image} 
+                    alt={client.name} 
+                    loading="lazy"
+                    decoding="async"
+                    className="relative z-10 w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-all duration-1000 group-hover:scale-110"
+                  />
+                  
+                  {client.websiteUrl && (
+                    <div className="absolute top-8 right-8 text-[#1E88E5] opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 duration-500">
+                      <ExternalLink size={20} />
+                    </div>
+                  )}
+                </div>
                 
-                <img 
-                  src={client.logoUrl || client.image} 
-                  alt={client.name} 
-                  loading="lazy"
-                  decoding="async"
-                  className="relative z-10 w-full h-full object-contain opacity-80 group-hover:opacity-100 transition-all duration-1000 group-hover:scale-110"
-                />
-                
-                {client.websiteUrl && (
-                  <div className="absolute top-6 right-6 text-[#1E88E5] opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
-                    <ExternalLink size={18} />
-                  </div>
-                )}
-              </div>
-              
-              <div className="p-8 md:p-10 text-center flex-grow flex flex-col justify-center">
-                  <h3 className="text-xl md:text-2xl font-black text-white mb-2 md:mb-3 leading-tight group-hover:text-[#1E88E5] transition-colors uppercase italic">{client.name}</h3>
-                  <p className="text-[#00b4d8] text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] opacity-60 group-hover:opacity-100 transition-opacity">
-                      {client.category || client.description || 'Industrial Partner'}
-                  </p>
-              </div>
+                <div className="p-8 md:p-10 text-center flex-grow flex flex-col justify-center">
+                    <h3 className="text-xl md:text-2xl font-black text-white mb-2 md:mb-3 leading-tight group-hover:text-[#1E88E5] transition-colors uppercase italic">{client.name}</h3>
+                    <p className="text-[#00b4d8] text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] opacity-50 group-hover:opacity-100 transition-opacity">
+                        {client.category || client.description || 'Industrial Partner'}
+                    </p>
+                </div>
 
-               {/* Progress bar visual */}
-               <div className="absolute bottom-4 left-10 right-10 h-[2px] bg-white/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-[#1E88E5] w-0 group-hover:w-full transition-all duration-1000" />
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                 {/* Progress bar visual - Centered and reduced width */}
+                 <div className="absolute bottom-6 left-1/4 right-1/4 h-[3px] bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#1E88E5] w-0 group-hover:w-full transition-all duration-1000 ease-in-out" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         {/* Sectors Section */}
         <div className="mt-60 mb-60">
             <div className="flex flex-col md:flex-row items-end justify-between gap-12 mb-24">
                 <div className="max-w-2xl">
                     <span className="text-royal font-black uppercase tracking-[0.5em] text-[10px] block mb-6">Vertical Matrices</span>
-                    <h2 className="text-5xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase italic">SECTORS WE <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-royal to-matrix">EMPOWER</span></h2>
+                    <h2 className="text-5xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase italic pr-4 md:pr-8">SECTORS WE <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-royal to-matrix">EMPOWER</span></h2>
                 </div>
                 <p className="text-white/30 text-xl font-medium max-w-sm border-l-2 border-royal/30 pl-8 leading-relaxed">
                     Our technical expertise spans the most demanding industrial environments in the region.
@@ -146,7 +157,7 @@ export default function Clients() {
                     { title: "Infrastructure", icon: "🏗️", color: "#f59e0b" }
                 ]).map((sector, i) => (
                     <motion.div 
-                        key={sector.title}
+                        key={sector.id || sector.title || i}
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         transition={{ delay: i * 0.1 }}
@@ -165,7 +176,7 @@ export default function Clients() {
             <div className="flex gap-20 animate-marquee whitespace-nowrap">
             <div className="flex gap-20 items-center">
                 {clients.concat(clients).slice(0, 16).map((c, i) => (
-                <span key={`${c.id}-${i}`} className="text-white/5 font-black text-6xl italic uppercase tracking-tighter hover:text-[#1E88E5]/20 transition-colors cursor-default select-none">
+                <span key={`marquee-${c.id || i}-${i}`} className="text-white/5 font-black text-6xl italic uppercase tracking-tighter hover:text-[#1E88E5]/20 transition-colors cursor-default select-none pr-4">
                     {c.name}
                 </span>
                 ))}
@@ -184,7 +195,7 @@ export default function Clients() {
              
              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-16 text-left">
                 <div className="max-w-2xl text-center md:text-left">
-                    <h2 className="text-5xl md:text-8xl font-black text-white mb-8 leading-[0.9] tracking-tighter italic uppercase">Join Our <br />Network</h2>
+                    <h2 className="text-5xl md:text-8xl font-black text-white mb-8 leading-[0.9] tracking-tighter italic uppercase pr-4 md:pr-8">Join Our <br />Network</h2>
                     <p className="text-white/90 text-xl font-medium leading-relaxed">Partner with Sri Lanka's leading engineering services provider to optimize your facility's potential.</p>
                 </div>
                 <button 

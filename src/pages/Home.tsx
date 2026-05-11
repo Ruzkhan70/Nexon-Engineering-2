@@ -471,7 +471,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-4xl md:text-7xl font-black text-white mb-4 md:mb-6 tracking-tighter leading-[0.9] uppercase italic"
+            className="text-4xl md:text-7xl font-black text-white mb-10 md:mb-16 tracking-tighter leading-[0.9] uppercase italic"
           >
             {(siteSettings?.heroTitle || "Engineering innovation with precision").split(' ').map((word: string, i: number) => (
               <span 
@@ -665,7 +665,7 @@ export default function Home() {
             
             <div className="absolute -inset-8 bg-royal/10 rounded-[80px] blur-3xl pointer-events-none" />
             <img 
-              src={new URL('../assets/images/regenerated_image_1778416445055.png', import.meta.url).href} 
+              src={new URL('../assets/images/about-preview.png', import.meta.url).href} 
               alt="Nexon Engineering Team" 
               loading="lazy"
               decoding="async"
@@ -767,33 +767,35 @@ export default function Home() {
                     ></textarea>
                   </div>
 
-                  <MagneticButton>
-                    <button 
-                      type="submit"
-                      disabled={isSubmittingReview}
-                      className="w-full py-10 bg-[#1E88E5] hover:bg-[#2196F3] text-white font-black uppercase tracking-[0.8em] text-[12px] rounded-full flex items-center justify-center gap-8 transition-all duration-1000 border border-white/20 shadow-[0_0_60px_rgba(30,136,229,0.3)] hover:shadow-[0_0_90px_rgba(30,136,229,0.6)] disabled:opacity-50 group overflow-hidden relative"
-                    >
-                      <span className="relative z-10 flex items-center gap-4">
-                        {isSubmittingReview ? 'INITIALIZING UPLOAD...' : 'SUBMIT VERDICT'}
-                      </span>
-                      
-                      {isSubmittingReview ? (
-                        <Loader2 className="animate-spin relative z-10 text-white" size={20} />
-                      ) : (
-                        <Zap size={20} className="relative z-10 text-white group-hover:scale-150 group-hover:rotate-12 transition-all duration-500" />
-                      )}
+                  <div className="flex justify-center pt-6">
+                    <MagneticButton className="w-full max-w-lg">
+                      <button 
+                        type="submit"
+                        disabled={isSubmittingReview}
+                        className="w-full py-10 bg-[#1E88E5] hover:bg-[#2196F3] text-white font-black uppercase tracking-[0.4em] text-[12px] rounded-full flex items-center justify-center gap-6 transition-all duration-1000 border border-white/20 shadow-[0_0_60px_rgba(30,136,229,0.3)] hover:shadow-[0_0_90px_rgba(30,136,229,0.6)] disabled:opacity-50 group overflow-hidden relative"
+                      >
+                        <span className="relative z-10 flex items-center gap-4">
+                          {isSubmittingReview ? 'INITIALIZING UPLOAD...' : 'SUBMIT VERDICT'}
+                        </span>
+                        
+                        {isSubmittingReview ? (
+                          <Loader2 className="animate-spin relative z-10 text-white" size={20} />
+                        ) : (
+                          <Zap size={20} className="relative z-10 text-white group-hover:scale-150 group-hover:rotate-12 transition-all duration-500" />
+                        )}
 
-                      {/* Gloss & Flare Overlays */}
-                      <div className="absolute inset-0 bg-gradient-to-tr from-white/5 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
-                      
-                      {/* Corner Accents - Technical Detail */}
-                      <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-white/40" />
-                      <div className="absolute top-2 right-2 w-1.5 h-1.5 border-t border-r border-white/40" />
-                      <div className="absolute bottom-2 left-2 w-1.5 h-1.5 border-b border-l border-white/40" />
-                      <div className="absolute bottom-2 right-2 w-1.5 h-1.5 border-b border-r border-white/40" />
-                    </button>
-                  </MagneticButton>
+                        {/* Gloss & Flare Overlays */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                        <div className="absolute inset-y-0 left-1/4 right-1/4 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out pointer-events-none" />
+                        
+                        {/* Corner Accents - Technical Detail */}
+                        <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-white/40" />
+                        <div className="absolute top-2 right-2 w-1.5 h-1.5 border-t border-r border-white/40" />
+                        <div className="absolute bottom-2 left-2 w-1.5 h-1.5 border-b border-l border-white/40" />
+                        <div className="absolute bottom-2 right-2 w-1.5 h-1.5 border-b border-r border-white/40" />
+                      </button>
+                    </MagneticButton>
+                  </div>
                 </form>
               </div>
             </motion.div>
@@ -831,7 +833,7 @@ export default function Home() {
               Deploy Nexon expertise to your facility today. Consult with our Matrix engineers for an industrial-grade solution.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-8 justify-center items-center pt-8">
+            <div className="flex flex-col sm:flex-row gap-8 justify-center items-center pt-12">
               <MagneticButton>
                 <Link 
                   to="/contact"
@@ -842,12 +844,14 @@ export default function Home() {
                 </Link>
               </MagneticButton>
               
-              <Link 
-                to="/services"
-                className="px-16 py-7 bg-white/5 backdrop-blur-xl border border-white/10 hover:border-royal text-white rounded-full font-black text-xl uppercase tracking-[0.2em] transition-all hover:bg-white/10"
-              >
-                Inspect Services
-              </Link>
+              <MagneticButton>
+                <Link 
+                  to="/services"
+                  className="px-16 py-7 bg-white/5 backdrop-blur-xl border border-white/10 hover:border-royal text-white rounded-full font-black text-xl uppercase tracking-[0.2em] transition-all hover:bg-white/10 block"
+                >
+                  Inspect Services
+                </Link>
+              </MagneticButton>
             </div>
           </motion.div>
         </div>

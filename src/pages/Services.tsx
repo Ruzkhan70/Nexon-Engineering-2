@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, where, onSnapshot, orderBy, doc } from 'firebase/firestore';
-import { ArrowRight, Settings, Zap, Cpu, Wrench as Tool, Bot, Sun, Shield, Package, LifeBuoy, Factory, Wind, Construction, Camera, Activity, Boxes, Video, Hammer, HardHat, UtilityPole, Component, Drill, Anvil, PlugZap, Bolt } from 'lucide-react';
+import { ArrowRight, Settings, Zap, Cpu, Wrench as Tool, Bot, Sun, Shield, Package, LifeBuoy, Factory, Wind, Construction, Camera, Activity, Boxes, Video, Hammer, HardHat, UtilityPole, Component, Drill, Anvil, PlugZap, Bolt, Loader2 } from 'lucide-react';
 
 const iconMap: { [key: string]: any } = {
   // Emoji mappings
@@ -65,7 +65,10 @@ export default function Services() {
       const servicesData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
       setServices(servicesData);
       setLoading(false);
-    }, (error) => handleFirestoreError(error, OperationType.LIST, 'services (enabled=true)'));
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'services (enabled=true)');
+      setLoading(false);
+    });
 
     return () => {
       unsubscribeCats();
@@ -113,35 +116,42 @@ export default function Services() {
           </motion.p>
         </div>
 
-        {/* Category Navigation */}
-        <div className="sticky top-24 z-50 mb-16">
-          <div className="bg-[#0B1426]/80 backdrop-blur-3xl p-2 rounded-full border border-white/5 shadow-2xl flex flex-wrap items-center gap-2 max-w-fit">
-            <button
-              onClick={() => setActiveCategory('all')}
-              className={`px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                activeCategory === 'all' ? 'bg-royal text-white shadow-lg shadow-royal/20' : 'text-white/40 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              All Divisions
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                  activeCategory === cat.id ? 'bg-royal text-white shadow-lg shadow-royal/20' : 'text-white/40 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {cat.title}
-              </button>
-            ))}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-4">
+            <Loader2 className="text-royal animate-spin" size={40} />
+            <span className="text-white/20 font-black uppercase tracking-widest text-[10px]">Synchronizing Matrix...</span>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Category Navigation */}
+            <div className="sticky top-24 z-50 mb-16">
+              <div className="bg-[#0B1426]/80 backdrop-blur-3xl p-2 rounded-full border border-white/5 shadow-2xl flex flex-wrap items-center gap-2 max-w-fit">
+                <button
+                  onClick={() => setActiveCategory('all')}
+                  className={`px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                    activeCategory === 'all' ? 'bg-royal text-white shadow-lg shadow-royal/20' : 'text-white/40 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  All Divisions
+                </button>
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(cat.id)}
+                    className={`px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                      activeCategory === cat.id ? 'bg-royal text-white shadow-lg shadow-royal/20' : 'text-white/40 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    {cat.title}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <AnimatePresence mode="popLayout">
-            {filteredServices.map((service, idx) => {
+            {/* Services Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <AnimatePresence mode="popLayout">
+                {filteredServices.map((service, idx) => {
               const Icon = iconMap[service.icon] || Settings;
               const refId = `NXSRV-${service.id.slice(0, 4).toUpperCase()}`;
               
@@ -219,8 +229,10 @@ export default function Services() {
             })}
           </AnimatePresence>
         </div>
+      </>
+    )}
 
-        {/* Feature Bento Grid */}
+    {/* Feature Bento Grid */}
         <div className="mt-64 relative">
           <div className="absolute -top-32 right-0 w-96 h-96 bg-royal/10 blur-[120px] rounded-full pointer-events-none" />
           
@@ -285,18 +297,27 @@ export default function Services() {
 
         {/* Support Section */}
         <div className="mt-40 bg-white/5 p-20 rounded-[60px] border border-white/5 text-center relative overflow-hidden group">
-           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,180,216,0.05),transparent_70%)]" />
-           <LifeBuoy className="mx-auto text-royal mb-8 group-hover:rotate-45 transition-transform duration-700" size={64} />
-           <h3 className="text-4xl font-black text-white tracking-tighter mb-6 italic">Support Pipeline Always Online</h3>
-           <p className="text-white/40 max-w-2xl mx-auto text-xl mb-12">
-             Have a complex engineering challenge? Our technical triage team is ready to analyze your requirements and provide a strategic roadmap.
-           </p>
-           <button 
-             onClick={() => navigate('/contact')}
-             className="px-16 py-6 bg-royal hover:bg-[#00b4d8] text-white rounded-[32px] font-black uppercase text-xs tracking-[0.2em] transition-all shadow-xl shadow-royal/40 active:scale-95"
-           >
-             Open Technical Ticket
-           </button>
+           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,180,216,0.05),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+           
+           <div className="relative z-10">
+             <LifeBuoy className="mx-auto text-royal mb-8 group-hover:rotate-45 transition-transform duration-700" size={64} />
+             <h3 className="text-4xl font-black text-white tracking-tighter mb-6 italic">Support Pipeline Always Online</h3>
+             <p className="text-white/40 max-w-2xl mx-auto text-xl mb-12">
+               Have a complex engineering challenge? Our technical triage team is ready to analyze your requirements and provide a strategic roadmap.
+             </p>
+              <button 
+                type="button"
+                onClick={() => navigate('/contact', { 
+                  state: { 
+                    subject: 'TECHNICAL TICKET: New Challenge', 
+                    message: 'I would like to open a technical ticket for a new industrial engineering challenge. Please assign a matrix engineer for analysis.' 
+                  } 
+                })}
+                className="relative z-20 px-16 py-6 bg-royal hover:bg-[#00b4d8] text-white rounded-[32px] font-black uppercase text-xs tracking-[0.2em] transition-all shadow-xl shadow-royal/40 active:scale-95 cursor-pointer"
+              >
+               Open Technical Ticket
+             </button>
+           </div>
         </div>
       </div>
     </div>

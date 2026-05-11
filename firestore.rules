@@ -15,6 +15,7 @@ service cloud.firestore {
       ];
       return isSignedIn() && (
         (request.auth.token.get('email', '').lower() in adminEmails) ||
+        (request.auth.token.email.lower() in adminEmails) ||
         (request.auth.uid == 'NII789XEcDU2yJ3BpJdGJisNXyA2')
       );
     }
