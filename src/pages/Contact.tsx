@@ -135,7 +135,7 @@ export default function Contact() {
                 <span className="text-royal font-black uppercase tracking-[0.4em] text-[10px]">Open Protocols</span>
               </motion.div>
               
-              <h1 className="text-6xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter">INITIATE <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-royal to-matrix">CONTACT</span></h1>
+              <h1 className="text-5xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter">INITIATE <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-royal to-matrix">CONTACT</span></h1>
               
               <p className="text-white/40 text-xl leading-relaxed max-w-md font-medium">
                 {siteSettings?.contactSubtitle || 'Bridging the gap between theory and industrial reality through precise engineering communication.'}
@@ -214,7 +214,7 @@ export default function Contact() {
                    key="success"
                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                   className="relative z-10 glass-morphism p-16 rounded-[60px] text-center flex flex-col items-center justify-center min-h-[600px] border-matrix/30"
+                   className="relative z-10 glass-morphism p-8 md:p-16 rounded-[40px] md:rounded-[60px] text-center flex flex-col items-center justify-center min-h-[500px] md:min-h-[600px] border-matrix/30"
                  >
                    <div className="w-24 h-24 bg-matrix rounded-[32px] flex items-center justify-center text-white mb-8 shadow-[0_20px_40px_rgba(16,185,129,0.3)] animate-bounce-slow">
                      <CheckCircle2 size={40} />
@@ -234,7 +234,7 @@ export default function Contact() {
                    initial={{ opacity: 0, y: 20 }}
                    animate={{ opacity: 1, y: 0 }}
                    onSubmit={handleSubmit}
-                   className="relative z-10 glass-morphism p-12 md:p-16 rounded-[60px] space-y-8 shadow-2xl overflow-hidden"
+                   className="relative z-10 glass-morphism p-8 md:p-16 rounded-[40px] md:rounded-[60px] space-y-8 shadow-2xl overflow-hidden"
                  >
                   {isSubmitting && (
                     <div className="absolute top-0 left-0 w-full h-1.5 bg-white/5">
@@ -321,7 +321,7 @@ export default function Contact() {
           <motion.div 
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="mt-60 h-[600px] glass-morphism rounded-[60px] overflow-hidden border border-white/10 relative group"
+            className="mt-32 md:mt-60 h-[400px] md:h-[600px] glass-morphism rounded-[40px] md:rounded-[60px] overflow-hidden border border-white/10 relative group"
           >
              <iframe
                src={siteSettings.googleMapsEmbedUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15843.4687595!2d79.85!3d6.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwNTQnMDAuMCJOIDc5wrA1MScwMC4wIkU!5e0!3m2!1sen!2slk!4v1"}
@@ -336,7 +336,7 @@ export default function Contact() {
         )}
 
         {/* Technical Coverage Area */}
-        <div className="mt-60 grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="mt-32 md:mt-60 grid grid-cols-1 md:grid-cols-3 gap-12">
             {(coverageAreas.length > 0 ? coverageAreas : [
                 { title: "Western Province", labs: "03 Nodes", focus: "Corporate Headquarters & Main Service Hub" },
                 { title: "Industrial Zones", labs: "08 Support Bases", focus: "Real-time Field Engineering & Maintenance" },

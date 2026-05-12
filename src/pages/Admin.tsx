@@ -1,3 +1,7 @@
+/**
+ * NEXON COMMAND CONTROL - Matrix Management Interface
+ * Refreshed: May 2024
+ */
 import React, { useState, useEffect, FormEvent, useLayoutEffect, useRef } from 'react';
 import { motion, AnimatePresence, Reorder } from 'motion/react';
 import { 

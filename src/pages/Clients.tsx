@@ -99,7 +99,7 @@ export default function Clients() {
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.05 }}
                 whileHover={client.websiteUrl ? { y: -10, scale: 1.02 } : {}}
-                className={`group bg-white/5 border border-white/10 rounded-[50px] shadow-2xl flex flex-col hover:bg-white/[0.07] hover:border-[#1E88E5]/40 transition-all duration-700 relative overflow-hidden h-full ${client.websiteUrl ? 'cursor-pointer' : 'cursor-default'}`}
+                className={`group bg-white/5 border border-white/10 rounded-[32px] md:rounded-[50px] shadow-2xl flex flex-col hover:bg-white/[0.07] hover:border-[#1E88E5]/40 transition-all duration-700 relative overflow-hidden h-full ${client.websiteUrl ? 'cursor-pointer' : 'cursor-default'}`}
               >
                 {/* Image Container - Curve down the edge */}
                 <div className="w-full h-48 md:h-64 bg-white/5 p-8 md:p-12 flex items-center justify-center relative overflow-hidden border-b border-white/5 shadow-inner">
@@ -111,7 +111,8 @@ export default function Clients() {
                     alt={client.name} 
                     loading="lazy"
                     decoding="async"
-                    className="relative z-10 w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-all duration-1000 group-hover:scale-110"
+                    draggable="false"
+                    className="relative z-10 w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-all duration-1000 group-hover:scale-110 select-none"
                   />
                   
                   {client.websiteUrl && (
@@ -138,7 +139,7 @@ export default function Clients() {
         )}
 
         {/* Sectors Section */}
-        <div className="mt-60 mb-60">
+        <div className="mt-32 md:mt-60 mb-32 md:mb-60">
             <div className="flex flex-col md:flex-row items-end justify-between gap-12 mb-24">
                 <div className="max-w-2xl">
                     <span className="text-royal font-black uppercase tracking-[0.5em] text-[10px] block mb-6">Vertical Matrices</span>
@@ -161,7 +162,7 @@ export default function Clients() {
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         transition={{ delay: i * 0.1 }}
-                        className="glass-morphism p-12 rounded-[40px] border border-white/5 hover:border-white/10 transition-all group relative overflow-hidden"
+                        className="glass-morphism p-8 md:p-12 rounded-[32px] md:rounded-[40px] border border-white/5 hover:border-white/10 transition-all group relative overflow-hidden"
                     >
                         <div className="absolute -right-8 -top-8 w-32 h-32 blur-3xl opacity-0 group-hover:opacity-20 transition-opacity" style={{ backgroundColor: sector.color || '#1E88E5' }} />
                         <div className="text-5xl mb-8 group-hover:scale-110 transition-transform inline-block">{sector.icon}</div>
@@ -188,7 +189,7 @@ export default function Clients() {
         <motion.section 
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="mt-60 bg-gradient-to-br from-[#1E88E5] to-[#00b4d8] p-12 md:p-32 rounded-[80px] relative overflow-hidden shadow-[0_50px_100px_rgba(30,136,229,0.3)]"
+          className="mt-32 md:mt-60 bg-gradient-to-br from-[#1E88E5] to-[#00b4d8] p-10 md:p-24 lg:p-32 rounded-[40px] md:rounded-[80px] relative overflow-hidden shadow-[0_50px_100px_rgba(30,136,229,0.3)]"
         >
              <div className="absolute top-0 left-0 w-full h-full opacity-10" style={{ backgroundImage: `radial-gradient(white 1.5px, transparent 1.5px)`, backgroundSize: '40px 40px' }} />
              <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-white/10 rounded-full blur-3xl" />

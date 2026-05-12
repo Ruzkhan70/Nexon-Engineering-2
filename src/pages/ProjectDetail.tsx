@@ -128,7 +128,7 @@ export default function ProjectDetail() {
               <motion.h1 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] italic pr-4"
+                className="text-4xl md:text-8xl font-black tracking-tighter leading-[0.9] italic pr-4"
               >
                 {project.title}
               </motion.h1>
@@ -175,7 +175,7 @@ export default function ProjectDetail() {
               setLightboxIndex(activeImage);
               setIsLightboxOpen(true);
             }}
-            className="relative h-[600px] rounded-[64px] overflow-hidden border border-white/10 shadow-2xl group cursor-pointer"
+            className="relative h-[400px] md:h-[600px] rounded-[32px] md:rounded-[64px] overflow-hidden border border-white/10 shadow-2xl group cursor-pointer"
           >
             <AnimatePresence mode="wait">
               <motion.img 
@@ -231,13 +231,13 @@ export default function ProjectDetail() {
             {(project.challenges || project.solutions) && (
               <div className="grid md:grid-cols-2 gap-10">
                 {project.challenges && (
-                  <div className="bg-white/5 p-10 rounded-[48px] border border-white/10 space-y-6">
+                  <div className="bg-white/5 p-8 md:p-10 rounded-[32px] md:rounded-[48px] border border-white/10 space-y-6">
                     <div className="text-royal/60 font-black text-[10px] uppercase tracking-[0.3em]">Operational Challenges</div>
                     <p className="text-white/60 font-medium italic">"{project.challenges}"</p>
                   </div>
                 )}
                 {project.solutions && (
-                  <div className="bg-royal/5 p-10 rounded-[48px] border border-royal/20 space-y-6">
+                  <div className="bg-royal/5 p-8 md:p-10 rounded-[32px] md:rounded-[48px] border border-royal/20 space-y-6">
                     <div className="text-matrix font-black text-[10px] uppercase tracking-[0.3em]">Engineered Solutions</div>
                     <p className="text-white/60 font-medium italic">"{project.solutions}"</p>
                   </div>
@@ -273,7 +273,7 @@ export default function ProjectDetail() {
 
           {/* Sidebar Gallery Thumbnails */}
           <div className="lg:col-span-4 space-y-12">
-             <div className="bg-[#0B1426] p-10 rounded-[56px] border border-white/5 shadow-2xl">
+             <div className="bg-[#0B1426] p-8 md:p-10 rounded-[32px] md:rounded-[56px] border border-white/5 shadow-2xl">
                 <h3 className="text-xl font-black italic uppercase tracking-tighter mb-8 border-b border-white/5 pb-4">Asset Manifest</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {allImages.map((img, idx) => (
@@ -299,7 +299,7 @@ export default function ProjectDetail() {
                 )}
              </div>
 
-             <div className="bg-gradient-to-br from-royal to-[#00b4d8] p-10 rounded-[56px] shadow-2xl relative overflow-hidden group">
+             <div className="bg-gradient-to-br from-royal to-[#00b4d8] p-8 md:p-10 rounded-[32px] md:rounded-[56px] shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:rotate-12 transition-transform">
                    <Zap size={120} />
                 </div>

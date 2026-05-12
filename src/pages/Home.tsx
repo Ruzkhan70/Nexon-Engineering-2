@@ -56,74 +56,91 @@ function TestimonialSlider({ reviews }: { reviews: any[] }) {
   const [isDragging, setIsDragging] = useState(false);
 
   // Default fallback reviews if none in db
-  const displayReviews = reviews.length > 0 ? reviews : [
-    { author: "Kamal Perera", rating: "5", content: "Excellent industrial electrical work. The team completed our factory wiring on time." },
-    { author: "Nimal Silva", rating: "5", content: "Nexon Engineering did our PLC automation upgrade. Production increased by 40%." },
-    { author: "Samantha Fernando", rating: "5", content: "Great emergency support! They fixed our machine breakdown within 2 hours." }
-  ];
+  const displayReviews = reviews;
 
-  // We repeat enough times to ensure smooth infinite loop even with 1 item
-  const duplicates = displayReviews.length < 3 ? 6 : 3;
+  // More duplicates (8) for a much smoother infinite transition and wider drag range
+  const duplicates = displayReviews.length === 0 ? 0 : 8;
   const repeatedReviews = Array.from({ length: duplicates }).flatMap(() => [...displayReviews, { isSpacer: true }]);
 
   useEffect(() => {
-    if (containerRef.current) {
-      setContainerWidth(containerRef.current.scrollWidth / duplicates);
-    }
-  }, [displayReviews, duplicates]);
-
-  useAnimationFrame((time, delta) => {
-    if (!isHovered && !isDragging) {
-      // Significantly faster speed
-      const moveBy = (delta * 0.12); 
-      let newX = x.get() - moveBy;
-
-      // Reset when reaching a full cycle
-      if (newX <= -containerWidth) {
-        newX += containerWidth;
+    if (containerRef.current && duplicates > 2 && displayReviews.length > 0) {
+      const children = containerRef.current.children;
+      const itemsPerSet = displayReviews.length + 1;
+      
+      if (children.length > itemsPerSet) {
+        const firstItem = children[0] as HTMLElement;
+        const secondSetFirstItem = children[itemsPerSet] as HTMLElement;
+        
+        const calculatedWidth = secondSetFirstItem.offsetLeft - firstItem.offsetLeft;
+        if (calculatedWidth > 0) {
+          setContainerWidth(calculatedWidth);
+          // Start centered in the duplicated set to allow dragging both directions
+          x.set(-calculatedWidth * 4);
+        }
       }
-      x.set(newX);
     }
+  }, [displayReviews, duplicates, x]);
+
+  useAnimationFrame((_, delta) => {
+    if (containerWidth <= 0) return;
+
+    let currentX = x.get();
+    
+    // 1. Auto-scroll logic (only when not interacting)
+    if (!isHovered && !isDragging) {
+      const moveBy = delta * 0.1; // Smooth constant speed
+      currentX -= moveBy;
+    }
+
+    // 2. Continuous wrapping logic
+    // We stay between -containerWidth * 5 and -containerWidth * 3
+    const minX = -containerWidth * 5;
+    const maxX = -containerWidth * 3;
+    const range = containerWidth;
+
+    if (currentX < minX) {
+      currentX += range;
+    } else if (currentX > maxX) {
+      currentX -= range;
+    }
+
+    x.set(currentX);
   });
 
   const onDragEnd = () => {
     setIsDragging(false);
-    // After drag, handle wrapping
-    let currentX = x.get();
-    if (currentX <= -containerWidth) {
-      x.set(currentX + containerWidth);
-    } else if (currentX > 0) {
-      x.set(currentX - containerWidth);
-    }
   };
+
+  if (displayReviews.length === 0) return null;
 
   return (
     <div 
-      className="flex py-10"
+      className="flex py-10 overflow-visible touch-none"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <motion.div
         drag="x"
-        dragElastic={0}
+        dragConstraints={{ left: -containerWidth * 7, right: -containerWidth }}
+        dragElastic={0.1}
         dragMomentum={true}
         onDragStart={() => setIsDragging(true)}
         onDragEnd={onDragEnd}
         ref={containerRef}
-        style={{ x }}
-        className="flex gap-8 whitespace-nowrap"
+        style={{ x, willChange: 'transform' }}
+        className="flex gap-8 whitespace-nowrap cursor-grab active:cursor-grabbing p-4 select-none"
       >
         {repeatedReviews.map((item: any, idx) => (
           item.isSpacer ? (
-            <div key={idx} className="w-[300px] md:w-[600px] flex-shrink-0 flex items-center justify-center gap-8 md:gap-16">
-              <div className="w-2 h-2 rounded-full bg-white/5" />
-              <div className="w-3 h-3 rounded-full bg-[#1E88E5]/20 animate-pulse" />
-              <div className="w-2 h-2 rounded-full bg-white/5" />
+            <div key={idx} className="w-[80px] md:w-[200px] flex-shrink-0 flex items-center justify-center gap-4 md:gap-8 opacity-40">
+              <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+              <div className="w-2 h-2 rounded-full bg-[#1E88E5]/40 animate-pulse" />
+              <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
             </div>
           ) : (
             <div 
               key={idx} 
-              className={`w-[280px] md:w-[450px] bg-white/5 backdrop-blur-3xl p-8 md:p-12 rounded-[48px] md:rounded-[60px] border border-white/10 whitespace-normal shadow-2xl flex-shrink-0 relative overflow-hidden group transition-all hover:bg-white/10`}
+              className="w-[280px] md:w-[450px] bg-white/5 backdrop-blur-3xl p-8 md:p-12 rounded-[48px] md:rounded-[60px] border border-white/10 whitespace-normal shadow-2xl flex-shrink-0 relative overflow-hidden group transition-all hover:bg-white/10 hover:border-[#1E88E5]/30"
               style={{ userSelect: 'none' }}
             >
               {/* Glossy overlay */}
@@ -138,7 +155,8 @@ function TestimonialSlider({ reviews }: { reviews: any[] }) {
                         alt={item.author} 
                         loading="lazy"
                         decoding="async"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                        draggable="false"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 select-none" 
                       />
                     </div>
                   )}
@@ -463,7 +481,8 @@ export default function Home() {
               alt="NEXON Logo" 
               loading="eager"
               decoding="async"
-              className="w-48 md:w-80 mx-auto drop-shadow-[0_0_60px_rgba(30,136,229,0.5)] transition-transform duration-700 hover:scale-[1.02]"
+              draggable="false"
+              className="w-48 md:w-80 mx-auto drop-shadow-[0_0_60px_rgba(30,136,229,0.5)] transition-transform duration-700 hover:scale-[1.02] select-none"
             />
           </motion.div>
 
@@ -536,7 +555,7 @@ export default function Home() {
 
       {/* Stats Bar */}
       <section className="relative -mt-16 z-20 px-6">
-        <div className="max-w-6xl mx-auto bg-[#0A2463]/90 backdrop-blur-2xl rounded-[40px] p-10 md:p-16 shadow-[0_40px_100px_rgba(0,0,0,0.4)] border border-white/10 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+        <div className="max-w-6xl mx-auto bg-[#0A2463]/90 backdrop-blur-2xl rounded-[32px] md:rounded-[40px] p-8 md:p-16 shadow-[0_40px_100px_rgba(0,0,0,0.4)] border border-white/10 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
           {staticStats.map((stat, idx) => (
             <motion.div 
               key={stat.label}
@@ -574,7 +593,7 @@ export default function Home() {
                   <div className="w-12 h-[1px] bg-royal" />
                   <span className="text-royal font-black tracking-[0.4em] uppercase text-xs">Technical Capability Matrix</span>
                 </div>
-                <h2 className="text-5xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase italic pr-4">Industrial <br />Successors</h2>
+                <h2 className="text-5xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase italic pr-4">Industrial <br />Solutions</h2>
               </div>
               <div className="md:max-w-md pb-4">
                 <p className="text-[#E1F5FE]/40 text-lg font-medium leading-relaxed italic border-l-2 border-royal/30 pl-8">
@@ -584,7 +603,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="relative cursor-grab active:cursor-grabbing">
+          <div className="relative">
             <TestimonialSlider reviews={services.map(s => ({
               id: s.id,
               author: s.title,
@@ -603,7 +622,7 @@ export default function Home() {
         {/* Subtle background tech pattern */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#0A2463 2px, transparent 2px)', backgroundSize: '30px 30px' }} />
         
-        <div className="max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-24 items-center">
+        <div className="max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -615,10 +634,10 @@ export default function Home() {
                 <span className="text-[#1E88E5] font-black tracking-[0.4em] uppercase text-[10px]">Registry: NXN-SRL-01</span>
                 <div className="flex-grow h-[1px] bg-[#0A2463]/10" />
               </div>
-              <h2 className="text-6xl md:text-8xl font-black leading-[0.85] tracking-tighter text-[#131313] uppercase italic">{siteSettings?.aboutTitle || "Built on Trust."}</h2>
+              <h2 className="text-5xl md:text-8xl font-black leading-[0.85] tracking-tighter text-[#131313] uppercase italic">{siteSettings?.aboutTitle || "Built on Trust."}</h2>
             </div>
             
-            <p className="text-xl text-[#0A2463]/70 font-medium leading-relaxed italic pr-12">
+            <p className="text-lg md:text-xl text-[#0A2463]/70 font-medium leading-relaxed italic pr-0 md:pr-12">
               {siteSettings?.aboutText || "Nexon Engineering is a trusted provider of industrial repair, maintenance, and automation services."}
             </p>
 
@@ -657,25 +676,26 @@ export default function Home() {
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="relative"
+            className="relative mt-20 lg:mt-0"
           >
             {/* Geometric Framing */}
-            <div className="absolute -top-10 -right-10 w-40 h-40 border-t-4 border-r-4 border-[#1E88E5]/20 rounded-tr-[80px]" />
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 border-b-4 border-l-4 border-[#1E88E5]/20 rounded-bl-[80px]" />
+            <div className="absolute -top-6 md:-top-10 -right-6 md:-right-10 w-24 md:w-40 h-24 md:h-40 border-t-4 border-r-4 border-[#1E88E5]/20 rounded-tr-[40px] md:rounded-tr-[80px]" />
+            <div className="absolute -bottom-6 md:-bottom-10 -left-6 md:-left-10 w-24 md:w-40 h-24 md:h-40 border-b-4 border-l-4 border-[#1E88E5]/20 rounded-bl-[40px] md:rounded-bl-[80px]" />
             
-            <div className="absolute -inset-8 bg-royal/10 rounded-[80px] blur-3xl pointer-events-none" />
+            <div className="absolute -inset-4 md:-inset-8 bg-royal/10 rounded-[40px] md:rounded-[80px] blur-2xl md:blur-3xl pointer-events-none" />
             <img 
               src={new URL('../assets/images/about-preview.png', import.meta.url).href} 
               alt="Nexon Engineering Team" 
               loading="lazy"
               decoding="async"
-              className="relative z-10 w-full aspect-[4/5] object-cover rounded-[60px] shadow-[0_50px_100px_rgba(0,0,0,0.15)] border-[16px] border-white"
+              draggable="false"
+              className="relative z-10 w-full aspect-[4/5] object-cover rounded-[40px] md:rounded-[60px] shadow-[0_50px_100px_rgba(0,0,0,0.15)] border-[8px] md:border-[16px] border-white select-none"
             />
             
             {/* Tech Badge */}
-            <div className="absolute -bottom-6 -right-6 z-20 bg-royal text-white p-8 rounded-[40px] shadow-2xl border-4 border-white">
-              <div className="text-4xl font-black italic tracking-tighter leading-none mb-1">08+</div>
-              <div className="text-[10px] font-black uppercase tracking-widest opacity-80 whitespace-nowrap">Years of Dominance</div>
+            <div className="absolute -bottom-4 md:-bottom-6 -right-4 md:-right-6 z-20 bg-royal text-white p-6 md:p-8 rounded-[30px] md:rounded-[40px] shadow-2xl border-4 border-white">
+              <div className="text-3xl md:text-4xl font-black italic tracking-tighter leading-none mb-1">08+</div>
+              <div className="text-[9px] md:text-[10px] font-black uppercase tracking-widest opacity-80 whitespace-nowrap">Years of Dominance</div>
             </div>
           </motion.div>
         </div>
@@ -702,7 +722,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[60px] p-10 md:p-20 text-center relative overflow-hidden group"
+              className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[40px] md:rounded-[60px] p-8 md:p-20 text-center relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 p-12 opacity-5 scale-150 group-hover:rotate-12 transition-transform duration-1000">
                 <Quote size={180} />
@@ -826,7 +846,7 @@ export default function Home() {
             <div className="inline-block p-4 bg-royal/10 border border-royal/20 rounded-3xl mb-4">
               <Zap className="text-royal" size={40} />
             </div>
-            <h2 className="text-6xl md:text-9xl font-black text-white leading-[0.8] tracking-tighter uppercase italic pr-4">
+            <h2 className="text-5xl md:text-9xl font-black text-white leading-[0.8] tracking-tighter uppercase italic pr-4">
               Initiate your <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00b4d8] to-royal">Project Matrix</span>
             </h2>
             <p className="text-white/40 text-xl md:text-2xl max-w-2xl mx-auto font-medium italic border-b border-royal/20 pb-12">

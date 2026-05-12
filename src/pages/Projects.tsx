@@ -96,9 +96,9 @@ export default function Projects() {
             <motion.h1 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-7xl md:text-9xl font-black text-white tracking-tighter leading-[0.8] mb-10 pr-4"
+              className="text-6xl md:text-9xl font-black text-white tracking-tighter leading-[0.8] mb-10 pr-4"
             >
-              PROJECT <br />
+              PROJECT <br className="hidden md:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-royal via-matrix to-royal bg-300% animate-gradient inline-block pr-1">ASSETS</span>
             </motion.h1>
             
@@ -118,8 +118,8 @@ export default function Projects() {
               <span className="text-white/20 font-black uppercase tracking-widest text-[10px]">Processing Project Matrix...</span>
             </div>
           ) : (
-            <div className="flex flex-col items-end gap-8">
-             <div className="flex flex-wrap justify-end gap-3 p-1.5 glass-morphism rounded-[24px]">
+            <div className="flex flex-col items-center md:items-end gap-8">
+             <div className="flex flex-wrap justify-center md:justify-end gap-3 p-1.5 glass-morphism rounded-[24px]">
                 {filterOptions.map((catId) => (
                   <button
                     key={catId}
@@ -179,7 +179,7 @@ export default function Projects() {
                   onMouseEnter={() => setHoveredIdx(idx)}
                   onMouseLeave={() => setHoveredIdx(null)}
                   onClick={() => navigate(`/projects/${project.id}`)}
-                   className={`${spanClass} group relative h-[500px] overflow-hidden rounded-[40px] border border-white/5 bg-white/5 hover:border-royal/80 hover:shadow-[0_30px_60px_rgba(30,136,229,0.1)] transition-all duration-300 cursor-pointer`}
+                   className={`${spanClass} group relative h-[400px] md:h-[500px] overflow-hidden rounded-[32px] md:rounded-[40px] border border-white/5 bg-white/5 hover:border-royal/80 hover:shadow-[0_30px_60px_rgba(30,136,229,0.1)] transition-all duration-300 cursor-pointer`}
                 >
                   <img 
                     src={project.imageUrl || project.image} 
@@ -207,7 +207,7 @@ export default function Projects() {
                   </div>
 
                   {/* Content Container */}
-                  <div className="absolute inset-x-0 bottom-0 p-10 md:p-12">
+                  <div className="absolute inset-x-0 bottom-0 p-8 md:p-12">
                     <motion.div 
                       initial={false}
                       animate={{ y: hoveredIdx === idx ? 0 : 20 }}
@@ -261,7 +261,7 @@ export default function Projects() {
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-60 relative h-[600px] flex items-center justify-center overflow-hidden rounded-[80px]"
+          className="mt-32 md:mt-60 relative h-[450px] md:h-[600px] flex items-center justify-center overflow-hidden rounded-[40px] md:rounded-[80px]"
         >
             <div className="absolute inset-0 bg-royal/10 backdrop-blur-3xl" />
             <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #1E88E5 1px, transparent 0)', backgroundSize: '60px 60px', opacity: 0.1 }} />
@@ -272,7 +272,7 @@ export default function Projects() {
                   <Sparkles size={40} />
                 </div>
               </div>
-              <h2 className="text-6xl md:text-8xl font-black text-white mb-10 tracking-tighter leading-none italic uppercase">
+              <h2 className="text-5xl md:text-8xl font-black text-white mb-10 tracking-tighter leading-none italic uppercase">
                 Ready to <br/><span className="text-royal">Matrix</span> yours?
               </h2>
               
@@ -280,7 +280,7 @@ export default function Projects() {
                 <MagneticButton strength={60}>
                   <button 
                     onClick={() => navigate('/contact')}
-                    className="px-16 py-8 bg-royal hover:bg-[#00b4d8] text-white rounded-[40px] font-black text-2xl uppercase tracking-widest transition-all shadow-[0_30px_100px_rgba(30,136,229,0.5)] group"
+                    className="px-10 md:px-16 py-6 md:py-8 bg-royal hover:bg-[#00b4d8] text-white rounded-[24px] md:rounded-[40px] font-black text-xl md:text-2xl uppercase tracking-widest transition-all shadow-[0_30px_100px_rgba(30,136,229,0.5)] group"
                   >
                     <span className="flex items-center gap-4">
                       Initiate Matrix <ArrowUpRight className="group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform" />

@@ -141,7 +141,7 @@ export default function About() {
               <motion.h1 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-6xl md:text-8xl lg:text-9xl font-black text-white tracking-widest leading-none uppercase italic"
+                className="text-5xl md:text-8xl lg:text-9xl font-black text-white tracking-widest leading-none uppercase italic"
               >
                 NEXON
               </motion.h1>
@@ -150,7 +150,7 @@ export default function About() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-6xl md:text-8xl lg:text-9xl font-black text-[#1E88E5] tracking-widest leading-none uppercase italic italic-outline-white"
+                className="text-5xl md:text-8xl lg:text-9xl font-black text-[#1E88E5] tracking-widest leading-none uppercase italic italic-outline-white"
               >
                 ENGINEERING
               </motion.h1>
@@ -183,7 +183,7 @@ export default function About() {
               whileInView={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 50 }}
               viewport={{ once: true }}
-              className="bg-[#0B1426] p-16 rounded-[60px] border border-white/5 relative overflow-hidden group"
+              className="bg-[#0B1426] p-8 md:p-16 rounded-[40px] md:rounded-[60px] border border-white/5 relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 p-12 opacity-5 scale-150 -rotate-12 group-hover:rotate-0 transition-transform duration-1000">
                 <Eye size={200} />
@@ -193,8 +193,8 @@ export default function About() {
                   <Eye size={32} />
                 </div>
                 <div className="inline-block px-3 py-1 bg-[#1E88E5]/10 border border-[#1E88E5]/20 text-[#1E88E5] text-[8px] font-black uppercase tracking-widest mb-4">Strategic Horizon</div>
-                <h2 className="text-5xl font-black mb-8 tracking-tighter text-white uppercase italic">Our Vision</h2>
-                <p className="text-xl text-white/40 leading-relaxed font-medium">
+                <h2 className="text-4xl md:text-5xl font-black mb-8 tracking-tighter text-white uppercase italic">Our Vision</h2>
+                <p className="text-lg md:text-xl text-white/40 leading-relaxed font-medium">
                   {siteSettings.aboutVision}
                 </p>
               </div>
@@ -205,7 +205,7 @@ export default function About() {
               initial={{ opacity: 0, y: 50 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="bg-[#1E88E5] p-16 rounded-[60px] relative overflow-hidden group shadow-[0_50px_100px_-20px_rgba(30,136,229,0.3)]"
+              className="bg-[#1E88E5] p-8 md:p-16 rounded-[40px] md:rounded-[60px] relative overflow-hidden group shadow-[0_50px_100px_-20px_rgba(30,136,229,0.3)]"
             >
               <div className="absolute top-0 right-0 p-12 opacity-20 scale-150 rotate-12 group-hover:rotate-0 transition-transform duration-1000">
                 <Target size={200} />
@@ -215,8 +215,8 @@ export default function About() {
                   <Target size={32} />
                 </div>
                 <div className="inline-block px-3 py-1 bg-white/10 border border-white/20 text-white text-[8px] font-black uppercase tracking-widest mb-4">Operational Protocol</div>
-                <h2 className="text-5xl font-black mb-8 tracking-tighter text-white uppercase italic">Our Mission</h2>
-                <p className="text-xl text-white/90 leading-relaxed font-medium">
+                <h2 className="text-4xl md:text-5xl font-black mb-8 tracking-tighter text-white uppercase italic">Our Mission</h2>
+                <p className="text-lg md:text-xl text-white/90 leading-relaxed font-medium">
                   {siteSettings.aboutMission}
                 </p>
               </div>
@@ -231,7 +231,7 @@ export default function About() {
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-8">
             <div className="max-w-2xl">
               <span className="text-[#1E88E5] font-black tracking-[0.4em] uppercase text-[10px] mb-4 block">Quality Control Standards</span>
-              <h2 className="text-7xl font-black text-white tracking-widest leading-none uppercase italic">
+              <h2 className="text-5xl md:text-7xl font-black text-white tracking-widest leading-none uppercase italic">
                 {siteSettings.aboutValuesTitle.split(' ').map((word, i) => (
                   i === siteSettings.aboutValuesTitle.split(' ').length - 1 
                     ? <span key={i} className="text-[#1E88E5] block italic italic-outline-white">{word}</span>
@@ -252,7 +252,7 @@ export default function About() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="bg-[#0B1426] border border-white/5 p-12 rounded-[50px] relative group hover:border-[#1E88E5]/50 transition-all duration-500 overflow-hidden"
+                className="bg-[#0B1426] border border-white/5 p-8 md:p-12 rounded-[40px] md:rounded-[50px] relative group hover:border-[#1E88E5]/50 transition-all duration-500 overflow-hidden"
               >
                 {/* Blueprint markings */}
                 <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-white/10 group-hover:border-[#1E88E5]/30" />
@@ -285,14 +285,14 @@ export default function About() {
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div>
               <span className="text-[#1E88E5] font-black tracking-[0.4em] uppercase text-[10px] mb-4 block">Operational Domains</span>
-              <h2 className="text-7xl font-black text-white tracking-widest leading-none uppercase italic mb-8">
+              <h2 className="text-5xl md:text-7xl font-black text-white tracking-widest leading-none uppercase italic mb-8">
                 {siteSettings.aboutTechnicalTitle.split(' ').map((word, i) => (
                   i === siteSettings.aboutTechnicalTitle.split(' ').length - 1 
                     ? <span key={i} className="text-[#1E88E5] block italic italic-outline-white">{word}</span>
                     : <span key={i}>{word} </span>
                 ))}
               </h2>
-              <p className="text-white/40 text-xl font-medium leading-relaxed mb-12">
+              <p className="text-lg md:text-xl text-white/40 font-medium leading-relaxed mb-12">
                 {siteSettings.aboutTechnicalSubtitle}
               </p>
               
@@ -385,16 +385,17 @@ export default function About() {
             </div>
 
             <div className="relative group">
-                <div className="absolute -inset-8 border-2 border-[#1E88E5]/20 rounded-[70px] pointer-events-none" />
+                <div className="absolute -inset-4 md:-inset-8 border-2 border-[#1E88E5]/20 rounded-[40px] md:rounded-[70px] pointer-events-none" />
                 <div className="absolute -top-4 -left-4 w-12 h-12 border-t-2 border-l-2 border-[#1E88E5] rounded-tl-3xl" />
                 <div className="absolute -bottom-4 -right-4 w-12 h-12 border-b-2 border-r-2 border-[#1E88E5] rounded-br-3xl" />
                 
-                <div className="relative z-10 rounded-[60px] overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 shadow-2xl border-4 border-white/5">
+                <div className="relative z-10 rounded-[32px] md:rounded-[60px] overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 shadow-2xl border-4 border-white/5">
                   <div className="absolute inset-0 bg-[#1E88E5]/20 pointer-events-none group-hover:opacity-0 transition-opacity" />
                   <img 
                     src={teamImage} 
                     alt="Nexon Engineering Team" 
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    draggable="false"
+                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 select-none"
                   />
                 </div>
             </div>
@@ -406,9 +407,9 @@ export default function About() {
       {/* Industrial Sectors */}
       <section className="py-40">
         <div className="max-w-7xl mx-auto px-8">
-           <div className="text-center mb-32">
-              <h2 className="text-6xl font-black text-white tracking-widest uppercase italic italic-outline-white">Operated <span className="text-[#1E88E5] italic italic-solid">Terrains</span></h2>
-              <p className="text-white/20 text-xs font-black uppercase tracking-[0.4em] mt-4">Cross-Sector Technical Deployment</p>
+           <div className="text-center mb-16 md:mb-32">
+              <h2 className="text-4xl md:text-6xl font-black text-white tracking-widest uppercase italic italic-outline-white">Operated <span className="text-[#1E88E5] italic italic-solid">Terrains</span></h2>
+              <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.4em] mt-4">Cross-Sector Technical Deployment</p>
            </div>
 
            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
@@ -449,22 +450,22 @@ export default function About() {
            <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
-              className="space-y-16"
+              className="space-y-8 md:space-y-16"
            >
-              <h2 className="text-7xl md:text-9xl font-black text-white leading-none tracking-widest uppercase italic">The Future is <br /><span className="text-[#1E88E5] italic italic-outline-white">Engineered</span></h2>
-              <p className="text-white/40 text-2xl font-medium leading-relaxed max-w-2xl mx-auto">
+              <h2 className="text-5xl md:text-9xl font-black text-white leading-none tracking-widest uppercase italic">The Future is <br /><span className="text-[#1E88E5] italic italic-outline-white">Engineered</span></h2>
+              <p className="text-lg md:text-2xl text-white/40 font-medium leading-relaxed max-w-2xl mx-auto">
                 Join the network of elite industrial partners who trust Nexon with their most critical operations.
               </p>
-              <div className="flex flex-col md:flex-row gap-8 justify-center">
+              <div className="flex flex-col md:flex-row gap-4 md:gap-8 justify-center items-center">
                  <button 
                   onClick={() => navigate('/projects')}
-                  className="px-16 py-8 bg-[#1E88E5] rounded-[40px] text-white font-black text-xs uppercase tracking-[0.3em] hover:shadow-[0_20px_50px_rgba(30,136,229,0.5)] transition-all cursor-pointer"
+                  className="w-full md:w-auto px-10 md:px-16 py-6 md:py-8 bg-[#1E88E5] rounded-2xl md:rounded-[40px] text-white font-black text-[10px] md:text-xs uppercase tracking-[0.3em] hover:shadow-[0_20px_50px_rgba(30,136,229,0.5)] transition-all cursor-pointer"
                 >
                   Inspect Matrix Projects
                 </button>
                  <button 
                   onClick={() => navigate('/contact')}
-                  className="px-16 py-8 bg-white/5 border border-white/10 rounded-[40px] text-white font-black text-xs uppercase tracking-[0.3em] hover:bg-white/10 transition-all cursor-pointer"
+                  className="w-full md:w-auto px-10 md:px-16 py-6 md:py-8 bg-white/5 border border-white/10 rounded-2xl md:rounded-[40px] text-white font-black text-[10px] md:text-xs uppercase tracking-[0.3em] hover:bg-white/10 transition-all cursor-pointer"
                 >
                   Establish Contact
                 </button>

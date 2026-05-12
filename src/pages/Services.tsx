@@ -101,9 +101,9 @@ export default function Services() {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-6xl md:text-8xl font-black text-white tracking-tighter leading-[0.9] mb-10"
+            className="text-5xl md:text-8xl font-black text-white tracking-tighter leading-[0.9] mb-10"
           >
-            Universal <span className="text-royal italic italic-outline-white">Engineering</span> <br />Solutions
+            Universal <span className="text-royal italic italic-outline-white">Engineering</span> <br className="hidden md:block" />Solutions
           </motion.h1>
           
           <motion.p 
@@ -187,7 +187,8 @@ export default function Services() {
                         <img 
                           src={service.imageUrl} 
                           alt={service.title} 
-                          className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-700"
+                          draggable="false"
+                          className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-700 select-none"
                         />
                       </div>
                     )}
@@ -242,9 +243,9 @@ export default function Services() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 min-h-[600px]">
+          <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 min-h-[600px]">
              {/* Main Bento */}
-             <div className="md:col-span-2 md:row-span-2 bg-gradient-to-br from-royal to-[#005f73] p-16 rounded-[60px] flex flex-col justify-end relative overflow-hidden group shadow-2xl">
+             <div className="md:col-span-2 md:row-span-2 bg-gradient-to-br from-royal to-[#005f73] p-8 md:p-16 rounded-[40px] md:rounded-[60px] flex flex-col justify-end relative overflow-hidden group shadow-2xl">
                 <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:opacity-20 transition-opacity">
                   <Factory size={240} className="text-white" />
                 </div>
@@ -252,8 +253,8 @@ export default function Services() {
                    <div className="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-3xl flex items-center justify-center mb-8 border border-white/20">
                       <Shield className="text-white" size={32} />
                    </div>
-                   <h3 className="text-4xl font-black text-white mb-6 uppercase leading-tight tracking-tighter">Gold-Standard industrial Compliance</h3>
-                   <p className="text-white/80 text-xl leading-relaxed font-medium">
+                   <h3 className="text-3xl md:text-4xl font-black text-white mb-6 uppercase leading-tight tracking-tighter">Gold-Standard industrial Compliance</h3>
+                   <p className="text-lg md:text-xl text-white/80 leading-relaxed font-medium">
                      Nexon Engineering follows rigorous international ISO and safety standards. Every repair, installation, and design is stress-tested for maximum longevity and environmental harmony.
                    </p>
                 </div>
@@ -296,13 +297,13 @@ export default function Services() {
         </div>
 
         {/* Support Section */}
-        <div className="mt-40 bg-white/5 p-20 rounded-[60px] border border-white/5 text-center relative overflow-hidden group">
+        <div className="mt-20 md:mt-40 bg-white/5 p-10 md:p-20 rounded-[40px] md:rounded-[60px] border border-white/5 text-center relative overflow-hidden group">
            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,180,216,0.05),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
            
            <div className="relative z-10">
              <LifeBuoy className="mx-auto text-royal mb-8 group-hover:rotate-45 transition-transform duration-700" size={64} />
-             <h3 className="text-4xl font-black text-white tracking-tighter mb-6 italic">Support Pipeline Always Online</h3>
-             <p className="text-white/40 max-w-2xl mx-auto text-xl mb-12">
+             <h3 className="text-3xl md:text-4xl font-black text-white tracking-tighter mb-6 italic">Support Pipeline Always Online</h3>
+             <p className="text-white/40 max-w-2xl mx-auto text-lg md:text-xl mb-12">
                Have a complex engineering challenge? Our technical triage team is ready to analyze your requirements and provide a strategic roadmap.
              </p>
               <button 
@@ -313,7 +314,7 @@ export default function Services() {
                     message: 'I would like to open a technical ticket for a new industrial engineering challenge. Please assign a matrix engineer for analysis.' 
                   } 
                 })}
-                className="relative z-20 px-16 py-6 bg-royal hover:bg-[#00b4d8] text-white rounded-[32px] font-black uppercase text-xs tracking-[0.2em] transition-all shadow-xl shadow-royal/40 active:scale-95 cursor-pointer"
+                className="w-full md:w-auto relative z-20 px-10 md:px-16 py-5 md:py-6 bg-royal hover:bg-[#00b4d8] text-white rounded-2xl md:rounded-[32px] font-black uppercase text-[10px] md:text-xs tracking-[0.2em] transition-all shadow-xl shadow-royal/40 active:scale-95 cursor-pointer"
               >
                Open Technical Ticket
              </button>
