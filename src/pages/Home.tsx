@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { motion, useScroll, useTransform, useInView, AnimatePresence, useMotionValue, useAnimationFrame } from 'motion/react';
 import { ChevronDown, ArrowRight, Zap, Cpu, Wrench as Tool, Briefcase, Sun, CheckCircle2, Star, Quote, MessageSquare, Send, Factory, Package, LifeBuoy, Construction, Wind, Camera, Settings, Bot, Shield, Activity, Boxes, Video, Hammer, HardHat, UtilityPole, Component, Drill, Anvil, PlugZap, Bolt, Sparkles, Loader2, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -58,44 +58,47 @@ function TestimonialSlider({ reviews }: { reviews: any[] }) {
   // Default fallback reviews if none in db
   const displayReviews = reviews;
 
-  // More duplicates (8) for a much smoother infinite transition and wider drag range
-  const duplicates = displayReviews.length === 0 ? 0 : 8;
-  const repeatedReviews = Array.from({ length: duplicates }).flatMap(() => [...displayReviews, { isSpacer: true }]);
+  // Reduced duplicates (4) for better performance while maintaining smooth infinite transition
+  const duplicates = displayReviews.length === 0 ? 0 : 4;
+  
+  const repeatedReviews = useMemo(() => {
+    return Array.from({ length: duplicates }).flatMap(() => [...displayReviews, { isSpacer: true }]);
+  }, [displayReviews, duplicates]);
 
   useEffect(() => {
-    if (containerRef.current && duplicates > 2 && displayReviews.length > 0) {
+    if (containerRef.current && duplicates > 0 && displayReviews.length > 0) {
       const children = containerRef.current.children;
       const itemsPerSet = displayReviews.length + 1;
       
-      if (children.length > itemsPerSet) {
+      if (children.length >= itemsPerSet * 2) {
         const firstItem = children[0] as HTMLElement;
         const secondSetFirstItem = children[itemsPerSet] as HTMLElement;
         
         const calculatedWidth = secondSetFirstItem.offsetLeft - firstItem.offsetLeft;
         if (calculatedWidth > 0) {
           setContainerWidth(calculatedWidth);
-          // Start centered in the duplicated set to allow dragging both directions
-          x.set(-calculatedWidth * 4);
+          // Start centered to allow dragging both directions
+          x.set(-calculatedWidth * 1.5);
         }
       }
     }
   }, [displayReviews, duplicates, x]);
 
   useAnimationFrame((_, delta) => {
-    if (containerWidth <= 0) return;
+    if (containerWidth <= 0 || isDragging) return;
 
     let currentX = x.get();
     
-    // 1. Auto-scroll logic (only when not interacting)
-    if (!isHovered && !isDragging) {
-      const moveBy = delta * 0.1; // Smooth constant speed
+    // Auto-scroll logic (only when not interacting)
+    if (!isHovered) {
+      const moveBy = delta * 0.08; // Slightly slower for smoother perceived motion
       currentX -= moveBy;
     }
 
-    // 2. Continuous wrapping logic
-    // We stay between -containerWidth * 5 and -containerWidth * 3
-    const minX = -containerWidth * 5;
-    const maxX = -containerWidth * 3;
+    // Continuous wrapping logic
+    // We stay between -containerWidth * 3 and -containerWidth
+    const minX = -containerWidth * 3;
+    const maxX = -containerWidth;
     const range = containerWidth;
 
     if (currentX < minX) {
@@ -121,8 +124,8 @@ function TestimonialSlider({ reviews }: { reviews: any[] }) {
     >
       <motion.div
         drag="x"
-        dragConstraints={{ left: -containerWidth * 7, right: -containerWidth }}
-        dragElastic={0.1}
+        dragConstraints={{ left: -containerWidth * 4, right: 0 }}
+        dragElastic={0.05}
         dragMomentum={true}
         onDragStart={() => setIsDragging(true)}
         onDragEnd={onDragEnd}
@@ -140,7 +143,7 @@ function TestimonialSlider({ reviews }: { reviews: any[] }) {
           ) : (
             <div 
               key={idx} 
-              className="w-[280px] md:w-[450px] bg-white/5 backdrop-blur-3xl p-8 md:p-12 rounded-[48px] md:rounded-[60px] border border-white/10 whitespace-normal shadow-2xl flex-shrink-0 relative overflow-hidden group transition-all hover:bg-white/10 hover:border-[#1E88E5]/30"
+              className="w-[280px] md:w-[450px] bg-white/5 backdrop-blur-xl p-8 md:p-12 rounded-[48px] md:rounded-[60px] border border-white/10 whitespace-normal shadow-2xl flex-shrink-0 relative overflow-hidden group transition-all hover:bg-white/10 hover:border-[#1E88E5]/30"
               style={{ userSelect: 'none' }}
             >
               {/* Glossy overlay */}

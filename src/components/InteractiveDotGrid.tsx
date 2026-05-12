@@ -16,11 +16,11 @@ export default function InteractiveDotGrid() {
     let height = 0;
     let backgroundDots: { x: number; y: number }[] = [];
     let particles: { x: number; y: number; vx: number; vy: number; size: number; baseAlpha: number; originX: number; originY: number }[] = [];
-    const particleCount = 400; // Significantly more particles for denser lines
-    const connectionDist = 240; // Increased for even denser connectivity
-    const repulsionDist = 220; // Increased for more responsive interaction
+    const particleCount = 380; // Significantly more particles for denser lines
+    const connectionDist = 280; // Increased for even denser connectivity
+    const repulsionDist = 240; 
     const mouse = { x: -1000, y: -1000 };
-    const gridSpacing = 30; // Closer grid points for more detail
+    const gridSpacing = 35; // Closer grid points for more detail
 
     const createParticle = (x: number, y: number, isBurst = false) => {
       const sx = (Math.random() - 0.5) * (isBurst ? 5 : 2.5); // Increased speed
@@ -147,15 +147,20 @@ export default function InteractiveDotGrid() {
 
         if (dist < repulsionDist) {
           const force = (repulsionDist - dist) / repulsionDist;
-          const accel = force * 6.5;
+          const accel = force * 12.5; // Significantly higher acceleration for instant response
           p.vx += (dx / dist) * accel;
           p.vy += (dy / dist) * accel;
+          
+          // Add a direct position offset for "instant" avoidance feel
+          const offset = force * 4.5;
+          p.x += (dx / dist) * offset;
+          p.y += (dy / dist) * offset;
         }
 
-        p.x += p.vx * 0.8;
-        p.y += p.vy * 0.8;
-        p.vx *= 0.96; 
-        p.vy *= 0.96;
+        p.x += p.vx * 1.2; // Faster movement
+        p.y += p.vy * 1.2;
+        p.vx *= 0.92; // Slightly higher friction to prevent too much chaos after initial snap
+        p.vy *= 0.92;
 
         p.x += (Math.sin(time / 2000 + i) * 0.2);
         p.y += (Math.cos(time / 2000 + i) * 0.2);
@@ -180,7 +185,7 @@ export default function InteractiveDotGrid() {
 
           if (distSq < connectionDist * connectionDist) {
             const dist2 = Math.sqrt(distSq);
-            const opacity = (1 - dist2 / connectionDist) * 0.8 * pulse; 
+            const opacity = (1 - dist2 / connectionDist) * 1.2 * pulse; 
             ctx.beginPath();
             ctx.strokeStyle = `rgba(143, 193, 250, ${opacity})`; 
             ctx.moveTo(p.x, p.y);
@@ -201,7 +206,7 @@ export default function InteractiveDotGrid() {
         
         if (distSqB < (connectionDist * 0.6) ** 2) {
           const distB = Math.sqrt(distSqB);
-          const opacityB = (1 - distB / (connectionDist * 0.6)) * 0.4 * pulse;
+          const opacityB = (1 - distB / (connectionDist * 0.6)) * 0.7 * pulse;
           ctx.beginPath();
           ctx.strokeStyle = `rgba(143, 193, 250, ${opacityB})`;
           ctx.moveTo(p.x, p.y);
