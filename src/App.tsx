@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
-import { AlertTriangle } from 'lucide-react';
-import { db, handleFirestoreError, OperationType } from './lib/firebase';
+import { db } from './lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';

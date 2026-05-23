@@ -2,13 +2,13 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Phone, MapPin, Send, Facebook, Linkedin, Instagram, Youtube, Sparkles, CheckCircle2, Zap, ArrowRight, Loader2, Cpu } from 'lucide-react';
 import { useState, FormEvent, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import emailjs from '@emailjs/browser';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, addDoc, doc, onSnapshot } from 'firebase/firestore';
 
 export default function Contact() {
   const location = useLocation();
   const [siteSettings, setSiteSettings] = useState<any>(null);
-  const [coverageAreas, setCoverageAreas] = useState<any[]>([]);
   const [aiDiagnosis, setAiDiagnosis] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -35,20 +35,14 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
+    emailjs.init('KQeP-JWgK9MRvedfv');
     onSnapshot(doc(db, 'settings', 'global'), (docSnap) => {
       if (docSnap.exists()) {
         setSiteSettings(docSnap.data());
       }
     }, (error) => handleFirestoreError(error, OperationType.GET, 'settings/global'));
 
-    const unsubCoverage = onSnapshot(collection(db, 'coverageAreas'), (snap) => {
-      const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-      setCoverageAreas(data.sort((a, b) => (a.order || 0) - (b.order || 0)));
-    }, (error) => {
-      console.warn("Coverage data restricted, maintaining local matrix nodes.");
-    });
-
-    return () => unsubCoverage();
+    return () => {};
   }, []);
 
   const resetForm = () => {
@@ -72,9 +66,9 @@ export default function Contact() {
 
         setSubmissionProgress(40);
         const docRef = await addDoc(collection(db, 'messages'), {
-          name: formData.name, // Required by rules (legacy)
-          email: formData.email, // Required by rules (legacy)
-          message: formData.message, // Required by rules (legacy)
+          name: formData.name, 
+          email: formData.email, 
+          message: formData.message, 
           customerName: formData.name,
           customerEmail: formData.email,
           customerGoal: location.state?.requirement || formData.message,
@@ -88,6 +82,30 @@ export default function Contact() {
         });
         
         setSubmissionProgress(70);
+        
+        // Dispatch to Admin Gmail via EmailJS
+        try {
+          const emailParams = {
+            subject: formData.subject,
+            from_name: formData.name,
+            customer_name: formData.name,
+            customer_email: formData.email,
+            message: formData.message,
+            ai_analysis: aiAnalysisData ? JSON.stringify(aiAnalysisData, null, 2) : 'No AI Analysis performed',
+            goal: location.state?.requirement || 'Standard Inquiry',
+            reply_to: formData.email,
+            action_name: 'New Industrial Inquiry',
+            website_link: window.location.origin
+          };
+
+          await emailjs.send(
+            'service_8vt7bep',
+            'template_b73a4if', // Using the security template as fallback, or assuming it handles generic fields if configured
+            emailParams
+          );
+        } catch (emailError) {
+          console.error("EmailJS transmission failed:", emailError);
+        }
         
         try {
           await addDoc(collection(db, 'notifications'), {
@@ -335,26 +353,6 @@ export default function Contact() {
           </motion.div>
         )}
 
-        {/* Technical Coverage Area */}
-        <div className="mt-32 md:mt-60 grid grid-cols-1 md:grid-cols-3 gap-12">
-            {(coverageAreas.length > 0 ? coverageAreas : [
-                { title: "Western Province", labs: "03 Nodes", focus: "Corporate Headquarters & Main Service Hub" },
-                { title: "Industrial Zones", labs: "08 Support Bases", focus: "Real-time Field Engineering & Maintenance" },
-                { title: "South Asia Reach", labs: "Remote Support", focus: "Regional Consultation & Technical Logistics" },
-            ]).map((zone, i) => (
-                <motion.div 
-                    key={zone.id || zone.title || i}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="p-10 border-l border-white/10 space-y-6"
-                >
-                    <div className="text-matrix font-black text-[10px] uppercase tracking-[0.4em]">{zone.labs}</div>
-                    <h5 className="text-2xl font-black text-white italic tracking-tighter uppercase">{zone.title}</h5>
-                    <p className="text-white/40 text-sm font-medium leading-relaxed">{zone.focus}</p>
-                </motion.div>
-            ))}
-        </div>
       </div>
     </div>
   );

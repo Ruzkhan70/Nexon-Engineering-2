@@ -279,12 +279,13 @@ export default function Admin() {
     return () => unsubscribe();
   }, []);
 
-  // Basic check for admin email
   const isAdmin = user && [
-    adminEmail.toLowerCase(), 
+    adminEmail?.toLowerCase(), 
     'ruzkaanjawahir07@gmail.com', 
     'nexonengineering.service@gmail.com'
-  ].includes(user.email.toLowerCase());
+  ].filter(Boolean).some(email => typeof email === 'string' && email.toLowerCase() === user.email?.toLowerCase());
+
+  // Basic check for admin email
 
   // Inactivity Listeners
   useEffect(() => {
@@ -417,6 +418,10 @@ export default function Admin() {
       setCounts(prev => ({ ...prev, services: snap.size }));
     }, (error) => handleFirestoreError(error, OperationType.LIST, 'services'));
 
+    const unsubServiceCategories = onSnapshot(collection(db, 'serviceCategories'), (snap) => {
+       // We can store this in counts or just use it to verify existence
+    }, (error) => handleFirestoreError(error, OperationType.LIST, 'serviceCategories'));
+
     const unsubProjects = onSnapshot(collection(db, 'projects'), (snap) => {
       setCounts(prev => ({ ...prev, projects: snap.size }));
     }, (error) => handleFirestoreError(error, OperationType.LIST, 'projects'));
@@ -440,6 +445,7 @@ export default function Admin() {
       unsubReviewsCount();
       unsubApprovedReviewsCount();
       unsubServices();
+      unsubServiceCategories();
       unsubProjects();
       unsubClients();
       unsubSettings();
@@ -595,8 +601,6 @@ export default function Admin() {
               { id: 'services', icon: SettingsIcon, label: 'Services' },
               { id: 'projects', icon: Briefcase, label: 'Portfolio' },
               { id: 'clients', icon: Users, label: 'Clients' },
-              { id: 'sectors', icon: Boxes, label: 'Sectors' },
-              { id: 'coverage', icon: MapPin, label: 'Coverage' },
               { id: 'reviews', icon: MessageSquare, label: 'Reviews' },
               { id: 'messages', icon: Mail, label: 'Messages' },
               { id: 'activity', icon: Activity, label: 'Audit Logs' },
@@ -697,12 +701,10 @@ export default function Admin() {
             transition={{ duration: 0.3 }}
           >
               {activeTab === 'dashboard' && <DashboardComponent counts={counts} setActiveTab={setActiveTab} currentSessionId={currentSessionId} logActivity={logActivity} askPermission={askPermission} />}
-              {activeTab === 'site' && <SiteContentEditor ImageDropzone={ImageDropzone} notify={notify} askPermission={askPermission} />}
+              {activeTab === 'site' && <SiteContentEditor ImageDropzone={ImageDropzone} notify={notify} askPermission={askPermission} logActivity={logActivity} />}
               {activeTab === 'services' && <NestedManager mainType="services" catType="serviceCategories" ImageDropzone={ImageDropzone} logActivity={logActivity} notify={notify} askPermission={askPermission} />}
               {activeTab === 'projects' && <NestedManager mainType="projects" catType="projectCategories" ImageDropzone={ImageDropzone} logActivity={logActivity} notify={notify} askPermission={askPermission} />}
               {activeTab === 'clients' && <GenericManager type="clients" ImageDropzone={ImageDropzone} logActivity={logActivity} notify={notify} askPermission={askPermission} />}
-              {activeTab === 'sectors' && <GenericManager type="sectors" ImageDropzone={ImageDropzone} logActivity={logActivity} notify={notify} askPermission={askPermission} />}
-              {activeTab === 'coverage' && <GenericManager type="coverageAreas" ImageDropzone={ImageDropzone} logActivity={logActivity} notify={notify} askPermission={askPermission} />}
               {activeTab === 'reviews' && <ReviewsManager notify={notify} logActivity={logActivity} askPermission={askPermission} />}
               {activeTab === 'messages' && <MessagesList notify={notify} logActivity={logActivity} askPermission={askPermission} />}
               {activeTab === 'activity' && <ActivityLogsList logActivity={logActivity} notify={notify} askPermission={askPermission} />}
@@ -1241,7 +1243,7 @@ function DashboardComponent({ counts, setActiveTab, currentSessionId, logActivit
                 <TrendingUp size={24} className="text-royal" />
                 Connectivity Flux
               </h3>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">7-Day Matrix Analysis</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">7-Day Engagement Analysis</p>
             </div>
             <div className="flex gap-6">
               <div className="flex items-center gap-2">
@@ -1397,7 +1399,7 @@ function DashboardComponent({ counts, setActiveTab, currentSessionId, logActivit
             onClick={() => setActiveTab('security')}
             className="w-full mt-8 py-4 bg-white/5 hover:bg-white/10 text-white/40 hover:text-white rounded-2xl font-black text-[9px] uppercase tracking-[0.3em] transition-all"
           >
-            Enter Security Matrix
+            Enter Security Portal
           </button>
         </div>
 
@@ -1444,7 +1446,7 @@ function AutoExpandingTextarea({ value, onChange, label, placeholder = "" }: { v
 }
 
 // --- Site Content Editor ---
-function SiteContentEditor({ ImageDropzone, notify, askPermission }: { ImageDropzone: any, notify: any, askPermission: any }) {
+function SiteContentEditor({ ImageDropzone, notify, askPermission, logActivity }: { ImageDropzone: any, notify: any, askPermission: any, logActivity: any }) {
   const [settings, setSettings] = useState<any>({
     heroTitle: 'Engineering innovation with precision',
     heroSubtitle: 'Real repair maintenance and automation solutions delivered with unparalleled excellence across Sri Lanka',
@@ -1521,11 +1523,11 @@ function SiteContentEditor({ ImageDropzone, notify, askPermission }: { ImageDrop
 
   const seedPreviousData = async () => {
     askPermission(
-      "This will synchronize professional industrial data to your matrix. This will overwrite some current settings and add missing resources. Continue?",
+      "PROTOCOL INITIALIZATION: This will synchronize the professional Matrix data core. Missing categories, services, projects, and clients will be re-instantiated. Existing settings will be updated to industry standard. Continue?",
       async () => {
         try {
           setIsSaving(true);
-          notify('Initializing professional synchronization...', 'info');
+          notify('Initiating Core Matrix Synchronization...', 'info');
           
           const professionalSettings = {
             heroTitle: 'ENGINEERING INNOVATION WITH PRECISION',
@@ -1537,51 +1539,78 @@ function SiteContentEditor({ ImageDropzone, notify, askPermission }: { ImageDrop
             statYears: 12,
             statSupport: 24,
             aboutMission: 'To deliver reliable, innovative engineering solutions that empower industries to operate efficiently and safely.',
-            aboutVision: 'To be the most trusted and innovative engineering services partner in South Asia.'
+            aboutVision: 'To be the most trusted and innovative engineering services partner in South Asia.',
+            featureServices: true,
+            featureProjects: true,
+            featureClients: true,
+            featureReviews: true
           };
 
-          const updatedSettings = { ...settings, ...professionalSettings };
+          const settingsRef = doc(db, 'settings', 'global');
+          const currentSettingsSnap = await getDoc(settingsRef);
+          const currentSettings = currentSettingsSnap.exists() ? currentSettingsSnap.data() : {};
+          
+          const updatedSettings = { ...currentSettings, ...professionalSettings };
           setSettings(updatedSettings);
-          await setDoc(doc(db, 'settings', 'global'), updatedSettings);
-          notify('Core Site DNA Updated...', 'info');
+          await setDoc(settingsRef, updatedSettings);
+          notify('Core Site DNA Verified and Updated.', 'info');
 
-          const [serviceCatsSnap, servicesSnap, projectsSnap, clientsSnap, sectorsSnap, coverageSnap] = await Promise.all([
+          // Fetch all snapshots again to check
+          const [serviceCatsSnap, servicesSnap, projectsSnap, projectCatsSnap, clientsSnap] = await Promise.all([
             getDocs(collection(db, 'serviceCategories')),
             getDocs(collection(db, 'services')),
             getDocs(collection(db, 'projects')),
-            getDocs(collection(db, 'clients')),
-            getDocs(collection(db, 'sectors')),
-            getDocs(collection(db, 'coverageAreas'))
+            getDocs(collection(db, 'projectCategories')),
+            getDocs(collection(db, 'clients'))
           ]);
 
           let categoryMap: Record<string, string> = {};
           
+          // 1. Service Categories
           if (serviceCatsSnap.empty) {
+            notify('Re-instantiating Service Categories...', 'info');
             const catBatch = writeBatch(db);
             const categories = [
               { title: 'Electrical & Machinery', icon: '⚡', order: 1, enabled: true },
               { title: 'Automation & Electronics', icon: '🤖', order: 2, enabled: true },
               { title: 'Mechanical & Fabrication', icon: '🛠️', order: 3, enabled: true },
               { title: 'Industrial Support & Services', icon: '🔧', order: 4, enabled: true },
-              { title: 'Solar & Security Systems', icon: '☀️', order: 5, enabled: true },
+              { title: 'Solar and Security Systems', icon: '☀️', order: 5, enabled: true },
             ];
             for (const c of categories) {
               const docRef = doc(collection(db, 'serviceCategories'));
               categoryMap[c.title] = docRef.id;
-              catBatch.set(docRef, c);
+              catBatch.set(docRef, { ...c, createdAt: new Date().toISOString() });
             }
             await catBatch.commit();
-            notify('Service Categories Synchronized...', 'info');
           } else {
             serviceCatsSnap.forEach(doc => {
-              categoryMap[doc.data().title] = doc.id;
+              categoryMap[doc.data().title || doc.data().name] = doc.id;
             });
           }
 
-          // Seed sample services if collection is empty
+          // 2. Project Categories
+          if (projectCatsSnap.empty) {
+            notify('Initializing Project Classifications...', 'info');
+            const pCatBatch = writeBatch(db);
+            const pCategories = [
+              { title: 'Automation', order: 1, enabled: true },
+              { title: 'Electrical', order: 2, enabled: true },
+              { title: 'Mechanical', order: 3, enabled: true },
+              { title: 'Modernization', order: 4, enabled: true }
+            ];
+            for (const c of pCategories) {
+              const docRef = doc(collection(db, 'projectCategories'));
+              pCatBatch.set(docRef, { ...c, createdAt: new Date().toISOString() });
+            }
+            await pCatBatch.commit();
+          }
+
+          // 3. Services
           if (servicesSnap.empty) {
+            notify('Injecting Industrial Service Protocols...', 'info');
             const serviceBatch = writeBatch(db);
-            const services = [
+            const servicesData = [
               { title: 'Machine Repair, Assembly & Maintenance', category: categoryMap['Electrical & Machinery'] || '', icon: '🛠️', description: 'Expert repair, assembly, and scheduled maintenance of all industrial machinery to ensure peak operational reliability.', order: 1, enabled: true },
               { title: 'Industrial Electrical Wiring', category: categoryMap['Electrical & Machinery'] || '', icon: '⚡', description: 'Advanced electrical wiring solutions for factories and plants, including high-voltage systems and specialized panel designs.', order: 2, enabled: true },
               { title: 'Industrial Automation', category: categoryMap['Automation & Electronics'] || '', icon: '🤖', description: 'Smart industrial automation solutions involving PLC programming and custom robotic integration to maximize productivity.', order: 3, enabled: true },
@@ -1591,107 +1620,61 @@ function SiteContentEditor({ ImageDropzone, notify, askPermission }: { ImageDrop
               { title: 'On-Site Technical Support', category: categoryMap['Industrial Support & Services'] || '', icon: '🔧', description: 'Strategic on-site maintenance and emergency technical support to minimize downtime and resolve complex engineering issues.', order: 7, enabled: true },
               { title: 'Industrial Services', category: categoryMap['Industrial Support & Services'] || '', icon: '🏭', description: 'A comprehensive suite of specialized engineering services designed to optimize and maintain modern industrial infrastructure.', order: 8, enabled: true },
               { title: 'Compressed Air Line Fixing & Maintenance', category: categoryMap['Industrial Support & Services'] || '', icon: '💨', description: 'Expert installation, repair, and optimization of industrial pneumatic systems and high-pressure compressed air networks.', order: 9, enabled: true },
-              { title: 'Solar Engineering', category: categoryMap['Solar & Security Systems'] || '', icon: '☀️', description: 'End-to-end solar energy integration, providing sustainable power solutions for large-scale industrial and commercial operations.', order: 10, enabled: true },
-              { title: 'CCTV Installation & Service', category: categoryMap['Solar & Security Systems'] || '', icon: '📹', description: 'Deployment of high-performance industrial surveillance systems with advanced monitoring and integrated security protocols.', order: 11, enabled: true },
+              { title: 'Solar Engineering', category: categoryMap['Solar and Security Systems'] || '', icon: '☀️', description: 'End-to-end solar energy integration, providing sustainable power solutions for large-scale industrial and commercial operations.', order: 10, enabled: true },
+              { title: 'CCTV Installation & Service', category: categoryMap['Solar and Security Systems'] || '', icon: '📹', description: 'Deployment of high-performance industrial surveillance systems with advanced monitoring and integrated security protocols.', order: 11, enabled: true },
             ];
-            for (const s of services) {
+            for (const s of servicesData) {
               const docRef = doc(collection(db, 'services'));
-              serviceBatch.set(docRef, s);
+              serviceBatch.set(docRef, { ...s, createdAt: new Date().toISOString() });
             }
             await serviceBatch.commit();
-            notify('Service Protocols Injected...', 'info');
           }
 
-          // Seed sample projects if collection is empty
+          // 4. Projects
           if (projectsSnap.empty) {
+            notify('Expanding Project Matrix...', 'info');
             const projectBatch = writeBatch(db);
-            const projects = [
-              { title: 'Factory Automation Overhaul', category: 'Automation', client: 'MAS Holdings', year: '2023', description: 'Full system upgrade of a textile production line.', enabled: true },
-              { title: 'Substation Installation', category: 'Electrical', client: 'Industrial Park', year: '2024', description: 'Installation of a 1500kVA substation.', enabled: true },
+            const projectsData = [
+              { title: 'Factory Automation Overhaul', category: 'Automation', client: 'MAS Holdings', year: '2023', description: 'Full system upgrade of a textile production line.', enabled: true, order: 1, createdAt: new Date().toISOString() },
+              { title: 'Substation Installation', category: 'Electrical', client: 'Industrial Park', year: '2024', description: 'Installation of a 1500kVA substation.', enabled: true, order: 2, createdAt: new Date().toISOString() },
+              { title: 'Robotic Arm Integration', category: 'Modernization', client: 'Lankem Ceylon', year: '2023', description: 'End-to-end robotic automation for chemical processing lines.', enabled: true, order: 3, createdAt: new Date().toISOString() }
             ];
-            for (const p of projects) {
+            for (const p of projectsData) {
               const docRef = doc(collection(db, 'projects'));
               projectBatch.set(docRef, p);
             }
             await projectBatch.commit();
-            notify('Project Matrix Expanded...', 'info');
           }
 
-          // Seed sample clients if collection is empty
+          // 5. Clients
           if (clientsSnap.empty) {
+            notify('Synchronizing Client Ecosystem...', 'info');
             const clientBatch = writeBatch(db);
-            const clients = [
+            const clientsData = [
               { name: 'Azmo', description: 'Industrial Partner', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client1.png', enabled: true, order: 1 },
               { name: 'Zahra International', description: 'Manufacturing Client', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client2.png', enabled: true, order: 2 },
-              { name: 'Hikma Industries', description: 'Corporate Partner', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client3.png', enabled: true, order: 3 },
-              { name: 'Gold Star', description: 'Factory Client', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client4.png', enabled: true, order: 4 },
-              { name: 'Pettah Essence Suppliers', description: 'Business Partner', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client5.png', enabled: true, order: 5 },
-              { name: 'Resplendent Ceylon', description: 'Enterprise Client', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client6.png', enabled: true, order: 6 },
               { name: 'MAS Holdings', description: 'Strategic Apparel Partner', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client7.png', enabled: true, order: 7 },
               { name: 'Brandix', description: 'Industrial Apparel Client', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client8.png', enabled: true, order: 8 },
-              { name: 'Holcim Lanka', description: 'Industrial Infrastructure', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client9.png', enabled: true, order: 9 },
-              { name: 'Lankem Ceylon', description: 'Chemical & Industrial Partner', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client10.png', enabled: true, order: 10 },
-              { name: 'Hirdaramani Group', description: 'Enterprise Manufacturing', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client11.png', enabled: true, order: 11 },
-              { name: 'Aitken Spence', description: 'Conglomerate Partner', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client12.png', enabled: true, order: 12 },
-              { name: 'John Keells Holdings', description: 'Enterprise Client', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client13.png', enabled: true, order: 13 },
               { name: 'Dialog Axiata', description: 'Telecommunications Partner', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client14.png', enabled: true, order: 14 },
-              { name: 'Sri Lanka Telecom', description: 'Network Infrastructure Hub', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client15.png', enabled: true, order: 15 },
-              { name: 'Unilever Sri Lanka', description: 'Manufacturing Partner', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client16.png', enabled: true, order: 16 },
-              { name: 'Nestlé Lanka', description: 'Production Facility Client', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client17.png', enabled: true, order: 17 },
-              { name: 'Coca-Cola Sri Lanka', description: 'Industrial Beverage Partner', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client18.png', enabled: true, order: 18 },
+              { name: 'Unilever Sri Lanka', description: 'Manufacturing Partner', logoUrl: 'https://raw.githubusercontent.com/NexonEngineering/nexonengineering.github.io/refs/heads/main/client16.png', enabled: true, order: 16 }
             ];
-            for (const c of clients) {
+            for (const c of clientsData) {
               const docRef = doc(collection(db, 'clients'));
-              clientBatch.set(docRef, c);
+              clientBatch.set(docRef, { ...c, createdAt: new Date().toISOString() });
             }
             await clientBatch.commit();
-            notify('Client Ecosystem Synchronized...', 'info');
           }
 
-          // Seed sectors
-          if (sectorsSnap.empty) {
-            const sectorBatch = writeBatch(db);
-            const sectors = [
-              { title: "Apparel & Textiles", icon: "🧵", color: "#1E88E5", enabled: true, order: 1 },
-              { title: "Manufacturing", icon: "🏭", color: "#00b4d8", enabled: true, order: 2 },
-              { title: "Food & Beverage", icon: "🥤", color: "#10b981", enabled: true, order: 3 },
-              { title: "Infrastructure", icon: "🏗️", color: "#f59e0b", enabled: true, order: 4 }
-            ];
-            for (const s of sectors) {
-              const docRef = doc(collection(db, 'sectors'));
-              sectorBatch.set(docRef, s);
-            }
-            await sectorBatch.commit();
-            notify('Market Sectors Injected...', 'info');
-          }
-
-          // Seed coverage
-          if (coverageSnap.empty) {
-            const coverageBatch = writeBatch(db);
-            const areas = [
-              { title: "Western Province", labs: "03 Nodes", focus: "Corporate Headquarters & Main Service Hub", enabled: true, order: 1 },
-              { title: "Industrial Zones", labs: "08 Support Bases", focus: "Real-time Field Engineering & Maintenance", enabled: true, order: 2 },
-              { title: "South Asia Reach", labs: "Remote Support", focus: "Regional Consultation & Technical Logistics", enabled: true, order: 3 },
-            ];
-            for (const a of areas) {
-              const docRef = doc(collection(db, 'coverageAreas'));
-              coverageBatch.set(docRef, a);
-            }
-            await coverageBatch.commit();
-            notify('Coverage Matrix Deployed...', 'info');
-          }
-
-          notify('Professional matrix fully synchronized!', 'success');
+          notify('Professional Matrix Fully Operational.', 'success');
+          await logActivity('MATRIX_CORE_SYNC', 'FULL_SYSTEM_RECOVERY');
         } catch (error: any) {
-          console.error("Seed error:", error);
-          notify('Sync failed: ' + error.message, 'error');
+          console.error("Critical Sync Failure:", error);
+          notify('Matrix synchronization failed: ' + error.message, 'error');
         } finally {
           setIsSaving(false);
         }
       },
-      "Industrial Data Sync",
-      false,
-      "Sync Matrix"
+      "Industrial Data Sync"
     );
   };
 
@@ -2438,22 +2421,9 @@ function GenericManager({ type, categoryCollection, ImageDropzone, logActivity, 
             >
               <Plus size={20} /> ADD NEW {typeLabel.toUpperCase()}
             </button>
-            {['projects', 'projectCategories', 'services', 'serviceCategories', 'sectors', 'coverageAreas'].includes(type) && (
+            {['projects', 'projectCategories', 'services', 'serviceCategories'].includes(type) && (
               <button 
                 onClick={() => {
-                  const demoSectors = [
-                    { name: "Apparel & Textiles", icon: "🧵", color: "#1E88E5", enabled: true, order: 1 },
-                    { name: "Manufacturing", icon: "🏭", color: "#00b4d8", enabled: true, order: 2 },
-                    { name: "Food & Beverage", icon: "🥤", color: "#10b981", enabled: true, order: 3 },
-                    { name: "Infrastructure", icon: "🏗️", color: "#f59e0b", enabled: true, order: 4 }
-                  ];
-
-                  const demoCoverage = [
-                    { name: "Western Province", labs: "03 Nodes", focus: "Corporate Headquarters & Main Service Hub", enabled: true, order: 1 },
-                    { name: "Industrial Zones", labs: "08 Support Bases", focus: "Real-time Field Engineering & Maintenance", enabled: true, order: 2 },
-                    { name: "South Asia Reach", labs: "Remote Support", focus: "Regional Consultation & Technical Logistics", enabled: true, order: 3 },
-                  ];
-
                   const demoProjects = [
                     { 
                       title: 'Solar Array Phase II', 
@@ -2501,16 +2471,24 @@ function GenericManager({ type, categoryCollection, ImageDropzone, logActivity, 
                   ];
 
                   const demoServices = [
-                    { title: 'Industrial Electrical Systems', description: 'Complete design and installation of high-voltage systems for factories and warehouses.', enabled: true, order: 1, icon: '⚡', complexity: 5, industrialTier: 3 },
-                    { title: 'Automation & Controls', description: 'Custom PLC programming and robotic integration for manufacturing excellence.', enabled: true, order: 2, icon: '🤖', complexity: 4, industrialTier: 2 },
-                    { title: 'Mechanical Engineering', description: 'Strategic structural audits and mechanical system optimization for heavy machinery.', enabled: true, order: 3, icon: '🔧', complexity: 3, industrialTier: 2 },
-                    { title: 'Predictive Maintenance', description: 'IoT-driven monitoring and analytics to prevent downtime before it happens.', enabled: true, order: 4, icon: 'Activity', complexity: 4, industrialTier: 1 },
-                    { title: 'Infrastructure Resilience', description: 'Seismic reinforcement and structural hardening for critical utility networks.', enabled: true, order: 5, icon: 'Shield', complexity: 5, industrialTier: 3 }
+                    { title: 'Machine Repair, Assembly & Maintenance', icon: '🛠️', description: 'Expert repair, assembly, and scheduled maintenance of all industrial machinery.', enabled: true, order: 1, complexity: 5, industrialTier: 3 },
+                    { title: 'Industrial Electrical Wiring', icon: '⚡', description: 'Advanced electrical wiring solutions for factories and plants.', enabled: true, order: 2, complexity: 4, industrialTier: 3 },
+                    { title: 'Industrial Automation', icon: '🤖', description: 'Smart industrial automation solutions involving PLC programming.', enabled: true, order: 3, complexity: 5, industrialTier: 2 },
+                    { title: 'Industrial Electronics Repairs', icon: '📟', description: 'High-precision diagnostics and repair services for industrial PCB.', enabled: true, order: 4, complexity: 5, industrialTier: 1 },
+                    { title: 'Mechanical Fabrication', icon: '🏗️', description: 'Custom structural fabrication and precision mechanical component design.', enabled: true, order: 5, complexity: 3, industrialTier: 2 },
+                    { title: 'Solar Engineering', icon: '☀️', description: 'End-to-end solar energy integration for sustainable power solutions.', enabled: true, order: 6, complexity: 4, industrialTier: 2 },
+                    { title: 'CCTV Installation & Service', icon: '📹', description: 'Deployment of high-performance industrial surveillance systems.', enabled: true, order: 7, complexity: 3, industrialTier: 1 },
                   ];
 
                   const demoCategories = type.toLowerCase().includes('project') 
                     ? ['Renewable Energy', 'Energy', 'Manufacturing', 'Infrastructure', 'Environment', 'Modernization', 'Chemical', 'Logistics'].map((t, i) => ({ title: t, order: i + 1, enabled: true }))
-                    : ['Automation', 'Civil Engineering', 'Electrical', 'Machine Service', 'Consulting'].map((t, i) => ({ title: t, order: i + 1, enabled: true }));
+                    : [
+                        { title: 'Electrical & Machinery', icon: '⚡', order: 1, enabled: true },
+                        { title: 'Automation & Electronics', icon: '🤖', order: 2, enabled: true },
+                        { title: 'Mechanical & Fabrication', icon: '🛠️', order: 3, enabled: true },
+                        { title: 'Industrial Support & Services', icon: '🔧', order: 4, enabled: true },
+                        { title: 'Solar and Security Systems', icon: '☀️', order: 5, enabled: true },
+                      ];
 
                   const isCategoryTab = isCategory;
 
@@ -2522,10 +2500,6 @@ function GenericManager({ type, categoryCollection, ImageDropzone, logActivity, 
                         let targetData = [];
                         if (isCategoryTab) {
                           targetData = demoCategories;
-                        } else if (type === 'sectors') {
-                          targetData = demoSectors;
-                        } else if (type === 'coverageAreas') {
-                          targetData = demoCoverage;
                         } else if (type.toLowerCase().includes('project')) {
                           targetData = demoProjects;
                         } else {
@@ -2702,7 +2676,7 @@ function GenericManager({ type, categoryCollection, ImageDropzone, logActivity, 
       </div>
 
       {/* Visual Preview Section for specialized types */}
-      {['sectors', 'coverageAreas', 'clients'].includes(type) && items.length > 0 && (
+      {type === 'clients' && items.length > 0 && (
         <div className="mt-24 space-y-12 pb-20">
           <div className="flex items-center gap-4">
             <div className="h-px flex-grow bg-white/5"></div>
@@ -2713,39 +2687,9 @@ function GenericManager({ type, categoryCollection, ImageDropzone, logActivity, 
             <div className="h-px flex-grow bg-white/5"></div>
           </div>
 
-          <div className={`grid gap-8 ${
-            type === 'sectors' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 
-            type === 'coverageAreas' ? 'grid-cols-1 md:grid-cols-3' : 
-            'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-          }`}>
+          <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {items.filter(i => i.enabled).map((item, i) => (
               <div key={item.id}>
-                {type === 'sectors' && (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="glass-morphism p-10 rounded-[40px] border border-white/5 group relative overflow-hidden text-left"
-                  >
-                    <div className="absolute -right-8 -top-8 w-32 h-32 blur-3xl opacity-0 group-hover:opacity-20 transition-opacity" style={{ backgroundColor: item.color || '#1E88E5' }} />
-                    <div className="text-5xl mb-8 group-hover:scale-110 transition-transform inline-block">{item.icon || '📁'}</div>
-                    <h4 className="text-xl font-black text-white italic uppercase tracking-tighter">{item.title || item.name}</h4>
-                  </motion.div>
-                )}
-
-                {type === 'coverageAreas' && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="p-10 border-l border-white/10 space-y-6 text-left h-full bg-white/2"
-                  >
-                    <div className="text-[#10b981] font-black text-[10px] uppercase tracking-[0.4em]">{item.labs || '0 Nodes'}</div>
-                    <h5 className="text-xl font-black text-white italic tracking-tighter uppercase">{item.title || item.name}</h5>
-                    <p className="text-white/40 text-xs font-medium leading-relaxed">{item.focus || 'System node description pending...'}</p>
-                  </motion.div>
-                )}
-
                 {type === 'clients' && (
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
@@ -2810,56 +2754,12 @@ function GenericManager({ type, categoryCollection, ImageDropzone, logActivity, 
                   <input 
                     type="text"
                     required
-                    value={['clients', 'sectors', 'coverageAreas'].includes(type) || isCategory ? formData.name || formData.title : formData.title || formData.name}
-                    onChange={(e) => setFormData({...formData, [['clients', 'sectors', 'coverageAreas'].includes(type) || isCategory ? 'name' : 'title']: e.target.value})}
+                    value={['clients'].includes(type) || isCategory ? formData.name || formData.title : formData.title || formData.name}
+                    onChange={(e) => setFormData({...formData, [['clients'].includes(type) || isCategory ? 'name' : 'title']: e.target.value})}
                     className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-lg font-black text-white focus:border-[#1E88E5] outline-none transition-all"
                     placeholder={`Enter ${typeLabel} name...`}
                   />
                 </div>
-
-                {type === 'sectors' && (
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black tracking-widest text-white/40 uppercase">Sector Highlight Color</label>
-                    <div className="flex gap-4">
-                      <input 
-                        type="color"
-                        value={formData.color}
-                        onChange={(e) => setFormData({...formData, color: e.target.value})}
-                        className="w-20 h-16 bg-white/5 border border-white/10 rounded-2xl p-2 cursor-pointer"
-                      />
-                      <input 
-                        type="text"
-                        value={formData.color}
-                        onChange={(e) => setFormData({...formData, color: e.target.value})}
-                        className="flex-grow bg-white/5 border border-white/10 rounded-2xl p-6 text-white font-mono uppercase"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {type === 'coverageAreas' && (
-                  <>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black tracking-widest text-white/40 uppercase">Nodes / Labs Count</label>
-                      <input 
-                        type="text"
-                        value={formData.labs}
-                        onChange={(e) => setFormData({...formData, labs: e.target.value})}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-white outline-none focus:border-[#1E88E5]"
-                        placeholder="e.g. 03 Nodes"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black tracking-widest text-white/40 uppercase">Operational Focus</label>
-                      <AutoExpandingTextarea 
-                         label=""
-                         value={formData.focus}
-                         onChange={(v) => setFormData({...formData, focus: v})}
-                         placeholder="Deep mission description..."
-                      />
-                    </div>
-                  </>
-                )}
 
                 {categoryCollection && !isCategory && (
                   <div className="space-y-3">
@@ -3086,7 +2986,7 @@ function GenericManager({ type, categoryCollection, ImageDropzone, logActivity, 
                         disabled={generatingAI}
                         className="text-[#1E88E5] text-[10px] font-black uppercase tracking-widest hover:text-white transition-all flex items-center gap-2"
                       >
-                         <Sparkles size={14} className={generatingAI ? 'animate-pulse' : ''} /> Generate Full Matrix
+                         <Sparkles size={14} className={generatingAI ? 'animate-pulse' : ''} /> Generate AI Draft
                       </button>
                     </div>
                     <textarea 
@@ -3504,8 +3404,17 @@ function MessagesList({ notify, logActivity, askPermission, limitTo, hideHeader 
       {filteredMessages.map((msg, i) => {
         const name = msg.customerName || msg.name || 'Anonymous';
         const email = msg.customerEmail || msg.email || 'No Email';
-        const goal = msg.customerGoal || (msg.message ? msg.message.split('AI Analysis:')[0].replace('Requirement:', '').trim() : 'No Goal Description');
+        const goal = msg.customerGoal || (msg.message ? msg.message.split('AI Analysis:')[0].replace('Requirement:', '').replace('[AI Matrix Inquiry]', '').trim() : 'No Goal Description');
         
+        // Fallback for AI Analysis if object is missing but text exists
+        const analysisFallback = !msg.aiAnalysis && msg.message?.includes('AI Analysis:') ? {
+          analysis: msg.message.split('AI Analysis:')[1]?.trim(),
+          urgency: 'Identified from Log',
+          steps: []
+        } : null;
+
+        const displayAnalysis = msg.aiAnalysis || analysisFallback;
+
         return (
           <motion.div 
             key={msg.id}
@@ -3522,7 +3431,7 @@ function MessagesList({ notify, logActivity, askPermission, limitTo, hideHeader 
             
             <div className="flex flex-col relative z-10">
               {/* --- BLOCK 1: CLIENT IDENTITY --- */}
-              <div className={`bg-white/5 p-10 border border-white/5 ${msg.isMatrixRequest ? 'rounded-t-[40px]' : 'rounded-[40px]'}`}>
+              <div className={`bg-white/5 p-10 border border-white/10 ${displayAnalysis ? 'rounded-t-[40px]' : 'rounded-[40px]'}`}>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-10">
                   <div className="flex items-center gap-8">
                     <div className="w-20 h-20 bg-white/5 rounded-[28px] border border-white/10 flex items-center justify-center font-black text-white text-3xl shadow-inner group-hover:bg-[#1E88E5] group-hover:border-[#1E88E5] transition-all duration-500">
@@ -3535,17 +3444,12 @@ function MessagesList({ notify, logActivity, askPermission, limitTo, hideHeader 
                   </div>
                   
                   <div className="flex flex-wrap gap-2">
-                    {msg.isMatrixRequest && (
-                      <div className="flex items-center gap-2">
-                        <span className="px-6 py-2 bg-[#1E88E5]/20 text-[#1E88E5] text-[10px] font-black rounded-full uppercase tracking-widest border border-[#1E88E5]/30 flex items-center gap-2">
-                          <Bot size={12} /> AI SOURCE
-                        </span>
-                        <div className="w-8 h-[2px] bg-[#1E88E5]/30"></div>
-                        <span className="text-[10px] font-black text-[#1E88E5] uppercase tracking-widest">Unified Project</span>
-                      </div>
-                    )}
-                    
                     {/* Status Badges */}
+                    {displayAnalysis && (
+                      <span className="px-6 py-2 bg-matrix/20 text-matrix text-[10px] font-black rounded-full uppercase tracking-widest border border-matrix/30 flex items-center gap-2">
+                        <Cpu size={12} /> AI MATRIX
+                      </span>
+                    )}
                     {msg.status === 'completed' && (
                       <span className="px-6 py-2 bg-emerald-500/20 text-emerald-400 text-[10px] font-black rounded-full uppercase tracking-widest border border-emerald-500/30 flex items-center gap-2">
                         <CheckCircle2 size={12} /> COMPLETED
@@ -3575,6 +3479,48 @@ function MessagesList({ notify, logActivity, askPermission, limitTo, hideHeader 
                         {goal}
                       </p>
                     </div>
+
+                    {displayAnalysis && (
+                      <div className="bg-matrix/10 p-8 rounded-[32px] border border-matrix/20 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+                          <Bot size={100} className="text-matrix" />
+                        </div>
+                        
+                        <div className="flex items-center gap-3 mb-6 relative z-10">
+                          <div className="w-8 h-8 rounded-lg bg-matrix/20 flex items-center justify-center text-matrix">
+                            <Sparkles size={16} />
+                          </div>
+                          <span className="text-matrix font-black text-[10px] uppercase tracking-widest">Nexon AI Matrix Analysis</span>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-8 relative z-10">
+                          <div>
+                            <div className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-3">AI Verdict</div>
+                            <p className="text-white/80 italic font-medium">"{displayAnalysis.analysis}"</p>
+                            
+                            <div className="mt-6 inline-flex items-center gap-3 px-4 py-2 bg-black/20 rounded-xl border border-white/5">
+                              <div className={`w-2 h-2 rounded-full ${displayAnalysis.urgency === 'High' ? 'bg-rose-500 animate-pulse' : 'bg-amber-500'}`} />
+                              <span className="text-[9px] font-black uppercase text-white/40 tracking-widest">Priority:</span>
+                              <span className="text-xs text-white font-black uppercase">{displayAnalysis.urgency}</span>
+                            </div>
+                          </div>
+
+                          {displayAnalysis.steps && (
+                            <div>
+                               <div className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-3">Recommended Protocol</div>
+                               <div className="space-y-2">
+                                  {displayAnalysis.steps.map((step: string, idx: number) => (
+                                    <div key={idx} className="flex items-center gap-3 text-xs text-white/60 font-medium">
+                                       <div className="w-5 h-5 rounded bg-matrix/20 flex items-center justify-center text-matrix text-[10px] font-black shrink-0">{idx+1}</div>
+                                       {step}
+                                    </div>
+                                  ))}
+                               </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {msg.message && msg.message !== goal && (
@@ -3598,65 +3544,6 @@ function MessagesList({ notify, logActivity, askPermission, limitTo, hideHeader 
                    </div>
                 </div>
               </div>
-
-              {/* --- BLOCK 2: AI MATRIX ANALYSIS --- */}
-              {msg.isMatrixRequest && msg.aiAnalysis && (
-                <div className="bg-[#1E88E5]/5 p-10 border-x border-b border-[#1E88E5]/20 group/matrix hover:bg-[#1E88E5]/10 rounded-b-[40px] transition-all">
-                  <div className="flex items-center gap-4 mb-10">
-                    <div className="w-10 h-10 rounded-xl bg-[#1E88E5] flex items-center justify-center shadow-lg shadow-[#1E88E5]/20">
-                      <Bot size={20} className="text-white" />
-                    </div>
-                    <div>
-                      <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-[#1E88E5]">Linked AI Matrix Report</h5>
-                      <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Strategic Engineering Plan</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    <div className="space-y-8">
-                      <div className="bg-white/5 p-8 rounded-3xl border border-white/5">
-                        <div className="flex items-center gap-3 mb-6">
-                          <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                            <CheckCircle2 size={12} className="text-emerald-500" />
-                          </div>
-                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">Diagnosis Output</span>
-                        </div>
-                        <p className="text-xl text-white/80 leading-relaxed font-bold tracking-tight italic">
-                          "{msg.aiAnalysis.analysis}"
-                        </p>
-                        
-                        <div className="flex flex-wrap gap-4 mt-8">
-                          <div className={`px-6 py-2 rounded-full border flex items-center gap-4 ${
-                            msg.aiAnalysis.urgency === 'High' ? 'bg-rose-500/10 border-rose-500/30 text-rose-500' : 'bg-amber-500/10 border-amber-500/30 text-amber-500'
-                          }`}>
-                             <div className={`w-2 h-2 rounded-full ${msg.aiAnalysis.urgency === 'High' ? 'bg-rose-500 animate-pulse' : 'bg-amber-500'}`} />
-                             <span className="text-[10px] font-black uppercase tracking-widest">PRIORITY: {msg.aiAnalysis.urgency || 'MEDIUM'}</span>
-                          </div>
-                          {msg.aiAnalysis.recommendedService && (
-                            <div className="bg-[#1E88E5]/10 px-6 py-2 rounded-full border border-[#1E88E5]/30 flex items-center gap-4">
-                               <span className="text-[10px] font-black text-[#1E88E5] uppercase tracking-widest">{msg.aiAnalysis.recommendedService}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-6">
-                      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 border-b border-white/5 pb-2">STRATEGIC MATRIX STEPS</div>
-                      <div className="space-y-4">
-                        {(msg.aiAnalysis.steps || []).map((step: string, idx: number) => (
-                          <div key={idx} className="bg-white/5 p-6 rounded-2xl border border-white/5 flex items-start gap-6 group/step hover:bg-white/10 transition-all">
-                            <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0 font-black text-[10px] text-white/40 border border-white/10 group-hover/step:bg-[#1E88E5] group-hover/step:text-white group-hover/step:border-[#1E88E5] transition-all">
-                              {idx + 1}
-                            </div>
-                            <p className="text-sm text-white/70 font-bold leading-relaxed">{step}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* --- CRM CONTROLS --- */}
               <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-8 mt-4 bg-white/5 rounded-[40px] border border-white/5">

@@ -1,12 +1,11 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { motion, useScroll, useTransform, useInView, AnimatePresence, useMotionValue, useAnimationFrame } from 'motion/react';
 import { ChevronDown, ArrowRight, Zap, Cpu, Wrench as Tool, Briefcase, Sun, CheckCircle2, Star, Quote, MessageSquare, Send, Factory, Package, LifeBuoy, Construction, Wind, Camera, Settings, Bot, Shield, Activity, Boxes, Video, Hammer, HardHat, UtilityPole, Component, Drill, Anvil, PlugZap, Bolt, Sparkles, Loader2, AlertTriangle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import InteractiveDotGrid from '../components/InteractiveDotGrid';
 import CountUp from '../components/CountUp';
 import MagneticButton from '../components/MagneticButton';
 import logoAsset from '../assets/images/regenerated_image_1778416443277.png';
-import { analyzeProjectRequirement } from '../services/aiService';
 import { db, handleFirestoreError, OperationType, auth } from '../lib/firebase';
 import { collection, query, where, onSnapshot, addDoc, orderBy, doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 
@@ -23,6 +22,9 @@ const iconMap: { [key: string]: any } = {
   '💨': Wind,
   '☀️': Sun,
   '📹': Camera,
+  'Solar and Security Systems': Sun,
+  'Solar & Security Systems': Sun,
+  'Sola and security system': Sun,
   // Named mappings from AI
   'Settings': Settings,
   'Activity': Activity,
@@ -214,117 +216,8 @@ function TestimonialSlider({ reviews }: { reviews: any[] }) {
   );
 }
 
-// --- AI Planner Component ---
-
-function AIPlannerWidget() {
-  const [input, setInput] = useState('');
-  const [result, setResult] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-
-  const handleAnalyze = async () => {
-    if (!input.trim()) return;
-    setLoading(true);
-    try {
-      const data = await analyzeProjectRequirement(input);
-      setResult(data);
-    } catch (error) {
-      console.error("AI Analysis failed:", error);
-      handleFirestoreError(error, OperationType.WRITE, 'ai-analysis');
-    }
-    setLoading(false);
-  };
-
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="max-w-4xl mx-auto px-6 mt-20 mb-32 relative z-30"
-    >
-      <div className="glass-morphism rounded-[40px] p-8 md:p-12 shadow-2xl overflow-hidden relative group">
-        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-          <Sparkles size={120} className="text-royal" />
-        </div>
-        
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-royal/20 flex items-center justify-center text-royal">
-              <Sparkles size={20} />
-            </div>
-            <span className="text-royal font-black uppercase tracking-[0.3em] text-xs">AI Project Matrix</span>
-          </div>
-          
-          <h3 className="text-3xl md:text-5xl font-black text-white mb-6 tracking-tighter">Describe your goal. <br/>We'll build the route.</h3>
-          
-          <div className="flex flex-col md:flex-row gap-4 mb-8">
-            <input 
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="e.g. My factory conveyor belt is stalling during high heat..."
-              className="flex-grow bg-white/10 border border-white/20 rounded-2xl px-6 py-4 text-white focus:border-royal outline-none transition-all font-medium placeholder:text-white/20"
-            />
-            <button 
-              onClick={handleAnalyze}
-              disabled={loading || !input}
-              className="bg-royal hover:bg-[#00b4d8] text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all disabled:opacity-50"
-            >
-              {loading ? <Loader2 className="animate-spin" /> : <><Zap size={20} /> ANALYZE</>}
-            </button>
-          </div>
-
-          <AnimatePresence>
-            {result && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="pt-8 border-t border-white/10 overflow-hidden"
-              >
-                <div className="grid md:grid-cols-2 gap-10">
-                  <div>
-                    <div className="flex items-center gap-2 text-matrix mb-3">
-                      <CheckCircle2 size={16} />
-                      <span className="text-[10px] font-black uppercase tracking-widest">Nexon Analysis</span>
-                    </div>
-                    <p className="text-white/80 leading-relaxed font-medium mb-6 italic">"{result.analysis}"</p>
-                    
-                    <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
-                      <div className={`w-3 h-3 rounded-full ${result.urgency === 'High' ? 'bg-rose-500 animate-pulse' : result.urgency === 'Medium' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
-                      <span className="text-xs font-black uppercase tracking-widest text-white/40">Priority: </span>
-                      <span className="text-xs font-bold text-white">{result.urgency}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40 block mb-2">Recommended Matrix Steps</span>
-                    {result.steps.map((step: string, i: number) => (
-                      <div key={i} className="flex items-start gap-4 p-4 glass-morphism rounded-xl hover:bg-white/10 transition-all border border-white/5">
-                        <div className="w-6 h-6 rounded-lg bg-royal flex items-center justify-center text-[10px] font-black shrink-0">{i+1}</div>
-                        <span className="text-sm font-medium text-white/90">{step}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="mt-10 flex justify-end">
-                  <Link 
-                    to="/contact" 
-                    state={{ requirement: input, diagnosis: result }}
-                    className="text-royal font-black text-sm uppercase tracking-widest flex items-center gap-2 hover:gap-4 transition-all"
-                  >
-                    DEPLOY THIS PLAN <ArrowRight size={20} />
-                  </Link>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
 export default function Home() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(0);
   const [siteSettings, setSiteSettings] = useState<any>({
     heroTitle: 'Engineering innovation with precision',
@@ -332,7 +225,43 @@ export default function Home() {
     aboutTitle: 'Built on Trust.',
     aboutText: 'Nexon Engineering is a trusted provider of industrial repair, maintenance, and automation services. We specialize in machine servicing, industrial electrical work, and custom engineering solutions designed to improve productivity and reliability.'
   });
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiResult, setAiResult] = useState<any>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const handleAnalyze = async () => {
+    if (!aiPrompt.trim()) return;
+    setIsAnalyzing(true);
+    setAiResult(null);
+    try {
+      const response = await fetch('/api/analyze-project', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: aiPrompt }),
+      });
+      const data = await response.json();
+      setAiResult(data);
+    } catch (error) {
+      console.error('Analysis failed:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleDeploy = () => {
+    navigate('/contact', { state: { 
+      requirement: aiPrompt,
+      diagnosis: {
+        analysis: aiResult.analysis,
+        urgency: aiResult.priority,
+        recommendedService: aiResult.steps[0], 
+        steps: aiResult.steps
+      }
+    }});
+  };
   const [services, setServices] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [newReview, setNewReview] = useState({ author: '', rating: 5, content: '' });
   const [hoverRating, setHoverRating] = useState(0);
@@ -349,16 +278,49 @@ export default function Home() {
       console.warn("Global settings restricted, using default matrix configuration.");
     });
 
-    // Fetch Services
-    const unsubServices = onSnapshot(query(collection(db, 'services'), where('enabled', '==', true), orderBy('order', 'asc')), (snap) => {
-      setServices(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    // Fetch Services - Simplified query to avoid index requirements
+    const unsubServices = onSnapshot(collection(db, 'services'), (snap) => {
+      const data = snap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as any))
+        .filter(s => s.enabled !== false)
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
+      setServices(data);
     }, (error) => {
       console.warn("Services data restricted, utilizing core capability fallbacks.");
     });
 
-    // Fetch Reviews
-    const unsubReviews = onSnapshot(query(collection(db, 'reviews'), where('approved', '==', true), orderBy('timestamp', 'desc')), (snap) => {
-      setReviews(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    // Fetch Projects - Added for Home visibility
+    const unsubProjects = onSnapshot(collection(db, 'projects'), (snap) => {
+      const data = snap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as any))
+        .filter(p => p.enabled !== false);
+      setProjects(data.slice(0, 3)); // Show top 3 featured projects
+    }, (error) => {
+      console.warn("Projects data restricted.");
+    });
+
+    // Fetch Clients - Added for Home visibility
+    const unsubClients = onSnapshot(collection(db, 'clients'), (snap) => {
+      const data = snap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as any))
+        .filter(c => c.enabled !== false)
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
+      setClients(data);
+    }, (error) => {
+      console.warn("Clients data restricted.");
+    });
+
+    // Fetch Reviews - Simplified query
+    const unsubReviews = onSnapshot(collection(db, 'reviews'), (snap) => {
+      const data = snap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as any))
+        .filter(r => r.approved === true)
+        .sort((a, b) => {
+          const t1 = new Date(a.timestamp).getTime();
+          const t2 = new Date(b.timestamp).getTime();
+          return t2 - t1;
+        });
+      setReviews(data);
     }, (error) => {
       console.warn("Review database restricted, showing verified partner testimonials.");
     });
@@ -366,6 +328,8 @@ export default function Home() {
     return () => {
       unsubSettings();
       unsubServices();
+      unsubProjects();
+      unsubClients();
       unsubReviews();
     };
   }, []);
@@ -438,13 +402,6 @@ export default function Home() {
           <InteractiveDotGrid />
         </div>
 
-        {/* Scanning Line Effect */}
-        <motion.div 
-          animate={{ top: ['-10%', '110%'] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-          className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#1E88E5]/30 to-transparent z-10 pointer-events-none"
-        />
-
         {/* Industrial Technical Accents */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
           {/* Corner Brackets */}
@@ -477,7 +434,7 @@ export default function Home() {
           >
             <div className="inline-flex items-center gap-4 px-5 py-1.5 bg-white/5 border border-white/10 rounded-full mb-5 md:mb-8 backdrop-blur-md">
               <span className="w-2 h-2 rounded-full bg-[#1E88E5] animate-pulse" />
-              <span className="text-[9px] md:text-[10px] font-black tracking-[0.4em] text-white/50 uppercase">Sri Lanka's Engineering Matrix</span>
+              <span className="text-[9px] md:text-[10px] font-black tracking-[0.4em] text-white/50 uppercase">Sri Lanka's Premier Engineering Partner</span>
             </div>
             <img 
               src={logoAsset} 
@@ -528,7 +485,7 @@ export default function Home() {
                 to="/services"
                 className="group relative px-10 py-5 bg-[#1E88E5] text-white rounded-full font-black text-sm uppercase tracking-widest overflow-hidden transition-all hover:scale-105 hover:shadow-[0_20px_50px_rgba(30,136,229,0.4)] block text-center min-w-[220px]"
               >
-                <span className="relative z-10">Explore Matrix</span>
+                <span className="relative z-10">Our Services</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
               </Link>
             </MagneticButton>
@@ -576,10 +533,108 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AI Planner Section */}
-      <section className="relative z-30 py-20 px-6 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-royal/5 rounded-full blur-[140px] pointer-events-none" />
-        <AIPlannerWidget />
+      {/* AI Project Matrix Section */}
+      <section className="py-32 bg-[#020617] relative">
+        <div className="max-w-4xl mx-auto px-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-[#0A1629] border border-white/10 rounded-[40px] md:rounded-[60px] p-8 md:p-16 relative overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)]"
+          >
+            <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none">
+              <Sparkles size={200} className="text-[#1E88E5]" />
+            </div>
+
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-2xl bg-[#1E88E5]/20 flex items-center justify-center text-[#1E88E5]">
+                  <Bot size={20} />
+                </div>
+                <span className="text-[#1E88E5] font-black text-[10px] uppercase tracking-[0.4em]">AI Project Matrix</span>
+              </div>
+
+              <h2 className="text-4xl md:text-6xl font-black text-white mb-12 tracking-tighter leading-none italic uppercase">
+                Describe your goal. <br />
+                <span className="text-white/40 italic italic-outline-white">We'll build the route.</span>
+              </h2>
+
+              <div className="relative mb-12 group">
+                <input 
+                  type="text" 
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAnalyze()}
+                  placeholder="e.g. My factory conveyor belt is stalling during high heat..."
+                  className="w-full bg-white/5 border border-white/10 rounded-3xl md:rounded-[32px] px-8 py-6 md:py-8 text-white text-lg focus:outline-none focus:border-[#1E88E5] transition-all pr-40 placeholder:text-white/20 font-medium"
+                />
+                <button 
+                  onClick={handleAnalyze}
+                  disabled={isAnalyzing || !aiPrompt.trim()}
+                  className="absolute right-3 top-3 bottom-3 px-8 bg-[#1E88E5] text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-[#2196F3] transition-all disabled:opacity-50"
+                >
+                  {isAnalyzing ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
+                  <span>{isAnalyzing ? 'Analyzing' : 'Analyze'}</span>
+                </button>
+              </div>
+
+              <AnimatePresence mode="wait">
+                {aiResult && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="grid md:grid-cols-2 gap-12 pt-8 border-t border-white/10 overflow-hidden"
+                  >
+                    <div className="space-y-8">
+                      <div>
+                        <div className="flex items-center gap-2 mb-4">
+                          <CheckCircle2 size={16} className="text-emerald-500" />
+                          <span className="text-emerald-500 font-black text-[10px] uppercase tracking-widest">Nexon Analysis</span>
+                        </div>
+                        <p className="text-white/80 text-xl italic font-medium leading-relaxed">
+                          "{aiResult.analysis}"
+                        </p>
+                      </div>
+
+                      <div className="inline-flex items-center gap-4 px-6 py-3 bg-white/5 rounded-2xl border border-white/10">
+                        <div className={`w-3 h-3 rounded-full ${aiResult.priority === 'High' ? 'bg-rose-500 animate-pulse' : aiResult.priority === 'Medium' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                        <span className="text-white/40 text-[10px] font-black uppercase tracking-widest">Priority:</span>
+                        <span className="text-white font-black text-sm uppercase">{aiResult.priority}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col">
+                      <span className="text-white/30 font-black text-[10px] uppercase tracking-widest mb-6 block">Recommended Matrix Steps</span>
+                      <div className="space-y-4">
+                        {aiResult.steps.map((step: string, i: number) => (
+                          <motion.div 
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            key={i} 
+                            className="flex items-center gap-5 p-5 bg-white/5 rounded-2xl border border-white/5 hover:border-[#1E88E5]/30 transition-colors group"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-[#1E88E5] flex items-center justify-center text-white font-black text-xs shrink-0 shadow-lg group-hover:scale-110 transition-transform">
+                              {i + 1}
+                            </div>
+                            <span className="text-white/70 text-sm font-bold leading-tight group-hover:text-white transition-colors">{step}</span>
+                          </motion.div>
+                        ))}
+                      </div>
+                      <button 
+                        onClick={handleDeploy}
+                        className="flex items-center gap-4 text-[#1E88E5] font-black uppercase text-xs tracking-[0.3em] mt-10 hover:gap-8 transition-all group w-full justify-end cursor-pointer"
+                      >
+                        DEPLOY THIS PLAN <ArrowRight size={20} />
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* Services Scroller */}
@@ -594,7 +649,7 @@ export default function Home() {
               <div className="max-w-3xl">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-12 h-[1px] bg-royal" />
-                  <span className="text-royal font-black tracking-[0.4em] uppercase text-xs">Technical Capability Matrix</span>
+                  <span className="text-royal font-black tracking-[0.4em] uppercase text-xs">Excellence in Engineering</span>
                 </div>
                 <h2 className="text-5xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase italic pr-4">Industrial <br />Solutions</h2>
               </div>
@@ -646,10 +701,10 @@ export default function Home() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8">
               {[
-                { label: 'Certified Engineers', sub: 'ISO 9001 Standards' },
-                { label: '24/7 Emergency Support', sub: 'Matrix-wide deployment' },
+                { label: 'Certified Engineers', sub: 'Standard Compliance' },
+                { label: '24/7 Emergency Support', sub: 'Island-wide deployment' },
                 { label: 'Quality Assurance', sub: 'Zero-fault tolerance' },
-                { label: 'Innovative Solutions', sub: 'Custom Matrix design' }
+                { label: 'Innovative Solutions', sub: 'Custom engineering design' }
               ].map((item) => (
                 <div key={item.label} className="flex items-start gap-4 group">
                   <div className="w-14 h-14 bg-[#1E88E5]/5 rounded-2xl flex items-center justify-center text-[#1E88E5] border border-[#1E88E5]/10 group-hover:bg-[#1E88E5] group-hover:text-white group-hover:scale-110 transition-all duration-500 shadow-sm">
@@ -704,124 +759,75 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials Ticker */}
-      {siteSettings?.featureReviews !== false && (
-        <section className="py-40 bg-[#020917] overflow-hidden relative">
-          {/* Background Grid */}
-          <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '100px 100px' }} />
-          
-          <div className="text-center mb-24 px-6 relative z-10">
-            <span className="text-royal font-black tracking-[0.5em] uppercase text-xs mb-6 block">Industry Validation</span>
-            <h2 className="text-5xl md:text-8xl font-black text-white tracking-tighter uppercase italic drop-shadow-[0_0_30px_rgba(30,136,229,0.2)]">Trusted by<br/>Operations Leaders</h2>
-          </div>
-          
-          <div className="relative group/slider cursor-grab active:cursor-grabbing z-10">
-            <TestimonialSlider reviews={reviews} />
-          </div>
-
-          {/* Review Submission Section */}
-          <div className="max-w-5xl mx-auto px-6 mt-32 relative z-10">
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[40px] md:rounded-[60px] p-8 md:p-20 text-center relative overflow-hidden group"
-            >
-              <div className="absolute top-0 right-0 p-12 opacity-5 scale-150 group-hover:rotate-12 transition-transform duration-1000">
-                <Quote size={180} />
+      {/* Featured Projects Section */}
+      {siteSettings?.featureProjects !== false && projects.length > 0 && (
+        <section className="py-40 bg-[#020617] relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-8">
+            <div className="flex flex-col md:flex-row items-end justify-between mb-24 gap-8">
+              <div>
+                <span className="text-royal font-black tracking-[0.5em] uppercase text-[10px] mb-4 block">Proven Performance</span>
+                <h2 className="text-5xl md:text-8xl font-black text-white tracking-tighter leading-[0.85] uppercase italic">Strategic <br /><span className="text-royal">Portfolio</span></h2>
               </div>
-              
-              <div className="relative z-10">
-                <div className="w-20 h-20 bg-royal/20 rounded-3xl flex items-center justify-center text-royal mx-auto mb-10 border border-royal/30">
-                  <MessageSquare size={40} />
+              <Link to="/projects" className="group flex items-center gap-4 text-white font-black uppercase text-xs tracking-widest hover:text-royal transition-colors pb-4">
+                View All Projects <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {projects.map((project, idx) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  onClick={() => navigate?.(`/projects/${project.id}`)}
+                  className="group relative h-[500px] rounded-[40px] overflow-hidden border border-white/5 cursor-pointer"
+                >
+                  <img 
+                    src={project.imageUrl || project.image} 
+                    alt={project.title} 
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-40"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                  <div className="absolute inset-0 p-10 flex flex-col justify-end">
+                    <span className="text-royal font-black text-[10px] uppercase tracking-[0.3em] mb-4">{project.category}</span>
+                    <h3 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">{project.title}</h3>
+                    <p className="text-white/40 text-sm font-medium line-clamp-2 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                      {project.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Clients Section */}
+      {siteSettings?.featureClients !== false && clients.length > 0 && (
+        <section className="py-32 bg-[#0A0F1E] border-t border-white/5 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6 mb-16">
+            <div className="flex flex-col md:flex-row justify-between items-end gap-8">
+              <div>
+                <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter">Trusted by Industry Leaders</h2>
+                <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.4em] mt-2">The Global NEXON Ecosystem</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="relative flex overflow-x-hidden">
+            <div className="animate-marquee whitespace-nowrap flex items-center">
+              {[...clients, ...clients].map((client, i) => (
+                <div key={i} className="mx-12 grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
+                  <img 
+                    src={client.logoUrl} 
+                    alt={client.name} 
+                    className="h-12 md:h-16 w-auto object-contain"
+                  />
                 </div>
-                <h3 className="text-4xl md:text-6xl font-black text-white mb-8 italic tracking-tighter uppercase">Submit Your Verdict</h3>
-                <p className="text-[#E1F5FE]/50 text-xl mb-16 max-w-2xl mx-auto italic font-medium leading-relaxed">
-                  Join our network of precision partners. Share your project experience with the Nexon Matrix.
-                </p>
-                
-                <form onSubmit={handleReviewSubmit} className="space-y-8 max-w-3xl mx-auto">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="relative group">
-                      <input 
-                        type="text" 
-                        required
-                        value={newReview.author}
-                        onChange={(e) => setNewReview({...newReview, author: e.target.value})}
-                        placeholder="Project Signature (Your Name)"
-                        className="w-full bg-white/5 border border-white/10 rounded-3xl px-8 py-6 text-white focus:border-royal outline-none transition-all placeholder:text-white/20 font-bold tracking-tight"
-                      />
-                      <div className="absolute right-6 top-1/2 -translate-y-1/2 text-white/10 group-focus-within:text-royal transition-colors">
-                        <Send size={20} />
-                      </div>
-                    </div>
-                    
-                    <div className="bg-[#0F172A]/50 border border-white/10 rounded-3xl px-8 py-6 flex items-center justify-between group-within:border-royal transition-all">
-                      <span className="text-white/30 text-[10px] font-black uppercase tracking-[0.2em]">Efficiency Rating:</span>
-                      <div className="flex gap-2">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            type="button"
-                            onClick={() => setNewReview({...newReview, rating: star})}
-                            onMouseEnter={() => setHoverRating(star)}
-                            onMouseLeave={() => setHoverRating(0)}
-                            className="transition-all transform hover:scale-150 focus:outline-none"
-                          >
-                            <Star 
-                              size={26} 
-                              fill={(hoverRating || newReview.rating) >= star ? "#1E88E5" : "none"} 
-                              className={(hoverRating || newReview.rating) >= star ? "text-[#1E88E5] drop-shadow-[0_0_10px_rgba(30,136,229,0.5)]" : "text-white/10"} 
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="relative">
-                    <textarea 
-                      placeholder="Enter detailed technical feedback..."
-                      required
-                      value={newReview.content}
-                      onChange={(e) => setNewReview({...newReview, content: e.target.value})}
-                      rows={5}
-                      className="w-full bg-white/5 border border-white/10 rounded-[40px] px-10 py-8 text-white focus:border-royal outline-none transition-all resize-none font-medium text-lg italic placeholder:text-white/15"
-                    ></textarea>
-                  </div>
-
-                  <div className="flex justify-center pt-6">
-                    <MagneticButton className="w-full max-w-lg">
-                      <button 
-                        type="submit"
-                        disabled={isSubmittingReview}
-                        className="w-full py-10 bg-[#1E88E5] hover:bg-[#2196F3] text-white font-black uppercase tracking-[0.4em] text-[12px] rounded-full flex items-center justify-center gap-6 transition-all duration-1000 border border-white/20 shadow-[0_0_60px_rgba(30,136,229,0.3)] hover:shadow-[0_0_90px_rgba(30,136,229,0.6)] disabled:opacity-50 group overflow-hidden relative"
-                      >
-                        <span className="relative z-10 flex items-center gap-4">
-                          {isSubmittingReview ? 'INITIALIZING UPLOAD...' : 'SUBMIT VERDICT'}
-                        </span>
-                        
-                        {isSubmittingReview ? (
-                          <Loader2 className="animate-spin relative z-10 text-white" size={20} />
-                        ) : (
-                          <Zap size={20} className="relative z-10 text-white group-hover:scale-150 group-hover:rotate-12 transition-all duration-500" />
-                        )}
-
-                        {/* Gloss & Flare Overlays */}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-                        <div className="absolute inset-y-0 left-1/4 right-1/4 bg-gradient-to-r from-transparent via-white/40 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out pointer-events-none" />
-                        
-                        {/* Corner Accents - Technical Detail */}
-                        <div className="absolute top-2 left-2 w-1.5 h-1.5 border-t border-l border-white/40" />
-                        <div className="absolute top-2 right-2 w-1.5 h-1.5 border-t border-r border-white/40" />
-                        <div className="absolute bottom-2 left-2 w-1.5 h-1.5 border-b border-l border-white/40" />
-                        <div className="absolute bottom-2 right-2 w-1.5 h-1.5 border-b border-r border-white/40" />
-                      </button>
-                    </MagneticButton>
-                  </div>
-                </form>
-              </div>
-            </motion.div>
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -850,10 +856,10 @@ export default function Home() {
               <Zap className="text-royal" size={40} />
             </div>
             <h2 className="text-5xl md:text-9xl font-black text-white leading-[0.8] tracking-tighter uppercase italic pr-4">
-              Initiate your <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00b4d8] to-royal">Project Matrix</span>
+              Initiate your <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00b4d8] to-royal">Engineering Project</span>
             </h2>
             <p className="text-white/40 text-xl md:text-2xl max-w-2xl mx-auto font-medium italic border-b border-royal/20 pb-12">
-              Deploy Nexon expertise to your facility today. Consult with our Matrix engineers for an industrial-grade solution.
+              Deploy Nexon expertise to your facility today. Consult with our engineers for an industrial-grade solution.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-8 justify-center items-center pt-12">

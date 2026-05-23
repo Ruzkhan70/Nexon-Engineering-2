@@ -53,7 +53,6 @@ export default function About() {
     aboutTechnicalTitle: 'Operational NEXON',
     aboutTechnicalSubtitle: 'Our expertise is partitioned into four primary technical domains, each monitored and executed by specialized Matrix engineers.',
   });
-  const [sectors, setSectors] = useState<any[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -77,17 +76,8 @@ export default function About() {
       }
     }, (error) => handleFirestoreError(error, OperationType.GET, 'settings/global'));
 
-    const unsubSectors = onSnapshot(query(collection(db, 'sectors'), where('enabled', '==', true)), (snap) => {
-      const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-      setSectors(data.sort((a, b) => (a.order || 0) - (b.order || 0)));
-    }, (error) => {
-      console.warn("Sectors access restricted by current rules, using matrix defaults.");
-      // Soft fail, don't throw
-    });
-
     return () => {
       unsubSettings();
-      unsubSectors();
     };
   }, []);
 
@@ -403,46 +393,6 @@ export default function About() {
         </div>
       </section>
 
-
-      {/* Industrial Sectors */}
-      <section className="py-40">
-        <div className="max-w-7xl mx-auto px-8">
-           <div className="text-center mb-16 md:mb-32">
-              <h2 className="text-4xl md:text-6xl font-black text-white tracking-widest uppercase italic italic-outline-white">Operated <span className="text-[#1E88E5] italic italic-solid">Terrains</span></h2>
-              <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.4em] mt-4">Cross-Sector Technical Deployment</p>
-           </div>
-
-           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-              {(sectors.length > 0 ? sectors : [
-                { title: 'Maritime', icon: '🚢' },
-                { title: 'Garments', icon: '🏭' },
-                { title: 'Hotels', icon: '🏢' },
-                { title: 'Utilities', icon: '⚡' },
-                { title: 'Packaging', icon: '📦' },
-                { title: 'Automotive', icon: '🏎️' }
-              ]).map((sector, i) => (
-                <motion.div 
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="bg-white/5 p-10 rounded-[50px] border border-white/5 flex flex-col items-center gap-8 group hover:bg-[#1E88E5] hover:shadow-[0_20px_50px_rgba(30,136,229,0.3)] transition-all duration-700 relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-                  <div className="text-white/20 group-hover:text-white transition-all duration-700 text-5xl group-hover:scale-110 relative z-10">
-                     {typeof sector.icon === 'string' ? sector.icon : <sector.icon size={48} />}
-                  </div>
-                  <span className="text-white/40 group-hover:text-white font-black uppercase text-[11px] tracking-[0.3em] text-center transition-all duration-700 relative z-10">{sector.title || sector.name}</span>
-                  
-                  {/* Subtle decorative "tick" for sectors too */}
-                  <div className="absolute bottom-4 left-1/3 right-1/3 h-[2px] bg-white/20 rounded-full overflow-hidden">
-                     <div className="h-full bg-white w-0 group-hover:w-full transition-all duration-1000 ease-in-out" />
-                  </div>
-                </motion.div>
-              ))}
-           </div>
-        </div>
-      </section>
 
       {/* Final Call to Legacy */}
       <section className="py-60 relative">

@@ -26,9 +26,11 @@ export default function Projects() {
       setCategories(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     }, (error) => handleFirestoreError(error, OperationType.LIST, 'projectCategories'));
 
-    const q = query(collection(db, 'projects'), where('enabled', '==', true));
-    const unsubProjects = onSnapshot(q, (snap) => {
-      setProjects(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    const unsubProjects = onSnapshot(collection(db, 'projects'), (snap) => {
+      const data = snap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as any))
+        .filter(p => p.enabled !== false);
+      setProjects(data);
       setLoading(false);
     }, (error) => {
       handleFirestoreError(error, OperationType.LIST, 'projects');

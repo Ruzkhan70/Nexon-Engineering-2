@@ -7,7 +7,6 @@ import { ExternalLink, Users, ArrowRight, Loader2 } from 'lucide-react';
 
 export default function Clients() {
   const [clients, setClients] = useState<any[]>([]);
-  const [sectors, setSectors] = useState<any[]>([]);
   const [siteSettings, setSiteSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -17,27 +16,19 @@ export default function Clients() {
       if (snap.exists()) setSiteSettings(snap.data());
     }, (error) => handleFirestoreError(error, OperationType.GET, 'settings/global'));
 
-    const qClients = query(collection(db, 'clients'), where('enabled', '==', true));
-    const unsubClients = onSnapshot(qClients, (snap) => {
-      setClients(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    const unsubClients = onSnapshot(collection(db, 'clients'), (snap) => {
+      const data = snap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as any))
+        .filter(c => c.enabled !== false);
+      setClients(data);
       setLoading(false);
     }, (error) => {
       handleFirestoreError(error, OperationType.LIST, 'clients');
       setLoading(false);
     });
 
-    const qSectors = query(collection(db, 'sectors'), where('enabled', '==', true));
-    const unsubSectors = onSnapshot(qSectors, (snap) => {
-      // Sort by order manually if needed or just use results
-      const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-      setSectors(data.sort((a, b) => (a.order || 0) - (b.order || 0)));
-    }, (error) => {
-      console.warn("Sectors access restricted, utilizing ecosystem fallbacks.");
-    });
-
     return () => {
       unsubClients();
-      unsubSectors();
     };
   }, []);
 
@@ -137,40 +128,6 @@ export default function Clients() {
             ))}
           </div>
         )}
-
-        {/* Sectors Section */}
-        <div className="mt-32 md:mt-60 mb-32 md:mb-60">
-            <div className="flex flex-col md:flex-row items-end justify-between gap-12 mb-24">
-                <div className="max-w-2xl">
-                    <span className="text-royal font-black uppercase tracking-[0.5em] text-[10px] block mb-6">Vertical Matrices</span>
-                    <h2 className="text-5xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase italic pr-4 md:pr-8">SECTORS WE <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-royal to-matrix">EMPOWER</span></h2>
-                </div>
-                <p className="text-white/30 text-xl font-medium max-w-sm border-l-2 border-royal/30 pl-8 leading-relaxed">
-                    Our technical expertise spans the most demanding industrial environments in the region.
-                </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {(sectors.length > 0 ? sectors : [
-                    { title: "Apparel & Textiles", icon: "🧵", color: "#1E88E5" },
-                    { title: "Manufacturing", icon: "🏭", color: "#00b4d8" },
-                    { title: "Food & Beverage", icon: "🥤", color: "#10b981" },
-                    { title: "Infrastructure", icon: "🏗️", color: "#f59e0b" }
-                ]).map((sector, i) => (
-                    <motion.div 
-                        key={sector.id || sector.title || i}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="glass-morphism p-8 md:p-12 rounded-[32px] md:rounded-[40px] border border-white/5 hover:border-white/10 transition-all group relative overflow-hidden"
-                    >
-                        <div className="absolute -right-8 -top-8 w-32 h-32 blur-3xl opacity-0 group-hover:opacity-20 transition-opacity" style={{ backgroundColor: sector.color || '#1E88E5' }} />
-                        <div className="text-5xl mb-8 group-hover:scale-110 transition-transform inline-block">{sector.icon}</div>
-                        <h4 className="text-2xl font-black text-white italic uppercase tracking-tighter">{sector.title}</h4>
-                    </motion.div>
-                ))}
-            </div>
-        </div>
 
         {/* Scrolling Marquee */}
         <div className="mt-20 py-10 border-t border-white/5 overflow-hidden">
