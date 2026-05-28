@@ -55,9 +55,9 @@ export default function Clients() {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-6xl md:text-[8rem] font-black text-white tracking-tighter leading-[0.85] mb-12 uppercase italic pr-4 md:pr-8"
+            className="text-6xl md:text-[8rem] font-black text-white tracking-tighter leading-[0.85] mb-12 uppercase italic"
           >
-            OUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1E88E5] to-[#00b4d8]">CLIENTS</span>
+            OUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1E88E5] to-[#00b4d8] pr-8">CLIENTS</span>
           </motion.h1>
           
           <motion.p 
