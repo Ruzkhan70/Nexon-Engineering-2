@@ -27,7 +27,7 @@ function AppContent({ settings, loading }: { settings: any, loading: boolean }) 
         {loading && <LoadingScreen key="loader" />}
       </AnimatePresence>
       
-      <div className="min-h-screen flex flex-col bg-[#020917] text-[#F8F9FA] font-sans selection:bg-[#1E88E5] selection:text-white">
+      <div className="min-h-screen flex flex-col bg-[#020917] text-[#F8F9FA] font-sans selection:bg-[#1E88E5] selection:text-white overflow-x-hidden w-full max-w-[100vw]">
         {!loading && (
           <div className="flex flex-col min-h-screen">
             <Navbar settings={settings} />

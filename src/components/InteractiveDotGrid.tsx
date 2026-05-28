@@ -109,6 +109,29 @@ export default function InteractiveDotGrid() {
       }
     };
 
+    const onTouchMove = (e: TouchEvent) => {
+      const rect = container.getBoundingClientRect();
+      const touch = e.touches[0];
+      if (touch) {
+        mouse.x = touch.clientX - rect.left;
+        mouse.y = touch.clientY - rect.top;
+      }
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      const rect = container.getBoundingClientRect();
+      const touch = e.touches[0];
+      if (touch) {
+        mouse.x = touch.clientX - rect.left;
+        mouse.y = touch.clientY - rect.top;
+      }
+    };
+
+    const onTouchEnd = () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    };
+
     let animationFrameId: number;
     let isVisible = true;
 
@@ -244,6 +267,12 @@ export default function InteractiveDotGrid() {
     container.addEventListener('mouseenter', onMouseEnter);
     container.addEventListener('mouseleave', onMouseLeave);
     window.addEventListener('mousedown', onClick);
+    
+    // Touch Events
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    container.addEventListener('touchstart', onTouchStart, { passive: true });
+    container.addEventListener('touchend', onTouchEnd);
+    container.addEventListener('touchcancel', onTouchEnd);
 
     resize();
     animationFrameId = requestAnimationFrame(animate);
@@ -254,6 +283,12 @@ export default function InteractiveDotGrid() {
       container.removeEventListener('mouseenter', onMouseEnter);
       container.removeEventListener('mouseleave', onMouseLeave);
       window.removeEventListener('mousedown', onClick);
+      
+      window.removeEventListener('touchmove', onTouchMove);
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchend', onTouchEnd);
+      container.removeEventListener('touchcancel', onTouchEnd);
+      
       observer.disconnect();
       cancelAnimationFrame(animationFrameId);
     };
