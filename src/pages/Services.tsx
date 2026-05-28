@@ -154,10 +154,10 @@ export default function Services() {
         ) : (
           <>
             <div className="sticky top-28 z-50 mb-20 flex justify-center w-full">
-              <nav className="bg-[#0A0F1E]/95 backdrop-blur-3xl p-2 rounded-full border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_20px_rgba(30,136,229,0.1)] flex items-center gap-3 max-w-[95vw] overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 px-6 md:px-8 min-h-[80px]">
+              <nav className="bg-[#0A0F1E]/95 backdrop-blur-3xl p-3 md:p-4 rounded-[32px] md:rounded-[40px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_20px_rgba(30,136,229,0.1)] flex flex-wrap justify-center items-center gap-3 max-w-[95vw] md:max-w-5xl px-6 md:px-8 min-h-[80px]">
                 <button
                   onClick={() => setActiveCategory('all')}
-                  className="relative px-10 md:px-16 py-4 md:py-5 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all z-10 cursor-pointer group flex-shrink-0"
+                  className="relative px-6 md:px-8 py-3.5 md:py-4 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all z-10 cursor-pointer group flex-shrink-0"
                 >
                   <span className={`relative z-20 transition-colors duration-300 whitespace-nowrap ${activeCategory === 'all' ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`}>
                     All Divisions
@@ -175,7 +175,7 @@ export default function Services() {
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
-                    className="relative px-10 md:px-16 py-4 md:py-5 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all z-10 cursor-pointer group flex-shrink-0"
+                    className="relative px-6 md:px-8 py-3.5 md:py-4 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all z-10 cursor-pointer group flex-shrink-0"
                   >
                     <span className={`relative z-20 transition-colors duration-300 whitespace-nowrap ${activeCategory === cat.id ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`}>
                       {cat.title}
@@ -189,9 +189,6 @@ export default function Services() {
                     )}
                   </button>
                 ))}
-                
-                {/* Scroll buffer */}
-                <div className="w-8 md:w-12 shrink-0 h-1" aria-hidden="true" />
               </nav>
             </div>
             {/* Services Grid */}
@@ -239,6 +236,7 @@ export default function Services() {
                                   src={service.imageUrl} 
                                   alt={service.title} 
                                   draggable="false"
+                                  referrerPolicy="no-referrer"
                                   className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-1000 select-none"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B1426] via-transparent to-transparent opacity-60" />

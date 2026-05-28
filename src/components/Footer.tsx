@@ -27,6 +27,7 @@ export default function Footer({ settings }: { settings: any }) {
           <img 
             src={logoAsset} 
             alt="Nexon Logo" 
+            referrerPolicy="no-referrer"
             className="h-20 w-auto"
           />
           <p className="text-[#E1F5FE]/70 leading-relaxed max-w-sm text-sm md:text-base">

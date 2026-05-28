@@ -103,6 +103,7 @@ export default function Clients() {
                     loading="lazy"
                     decoding="async"
                     draggable="false"
+                    referrerPolicy="no-referrer"
                     className="relative z-10 w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-all duration-1000 group-hover:scale-110 select-none"
                   />
                   

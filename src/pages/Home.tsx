@@ -6,6 +6,7 @@ import InteractiveDotGrid from '../components/InteractiveDotGrid';
 import CountUp from '../components/CountUp';
 import MagneticButton from '../components/MagneticButton';
 import logoAsset from '../assets/images/regenerated_image_1778416443277.png';
+import aboutPreview from '../assets/images/about-preview.png';
 import { db, handleFirestoreError, OperationType, auth } from '../lib/firebase';
 import { collection, query, where, onSnapshot, addDoc, orderBy, doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 
@@ -161,6 +162,7 @@ function TestimonialSlider({ reviews }: { reviews: any[] }) {
                         loading="lazy"
                         decoding="async"
                         draggable="false"
+                        referrerPolicy="no-referrer"
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 select-none" 
                       />
                     </div>
@@ -442,6 +444,7 @@ export default function Home() {
               loading="eager"
               decoding="async"
               draggable="false"
+              referrerPolicy="no-referrer"
               className="w-48 md:w-80 mx-auto drop-shadow-[0_0_60px_rgba(30,136,229,0.5)] transition-transform duration-700 hover:scale-[1.02] select-none"
             />
           </motion.div>
@@ -742,11 +745,12 @@ export default function Home() {
             
             <div className="absolute -inset-4 md:-inset-8 bg-royal/10 rounded-[40px] md:rounded-[80px] blur-2xl md:blur-3xl pointer-events-none" />
             <img 
-              src={new URL('../assets/images/about-preview.png', import.meta.url).href} 
+              src={aboutPreview} 
               alt="Nexon Engineering Team" 
               loading="lazy"
               decoding="async"
               draggable="false"
+              referrerPolicy="no-referrer"
               className="relative z-10 w-full aspect-[4/5] object-cover rounded-[40px] md:rounded-[60px] shadow-[0_50px_100px_rgba(0,0,0,0.15)] border-[8px] md:border-[16px] border-white select-none"
             />
             
@@ -787,6 +791,7 @@ export default function Home() {
                   <img 
                     src={project.imageUrl || project.image} 
                     alt={project.title} 
+                    referrerPolicy="no-referrer"
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-40"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
@@ -804,33 +809,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* Clients Section */}
-      {siteSettings?.featureClients !== false && clients.length > 0 && (
-        <section className="py-32 bg-[#0A0F1E] border-t border-white/5 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-6 mb-16">
-            <div className="flex flex-col md:flex-row justify-between items-end gap-8">
-              <div>
-                <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter">Trusted by Industry Leaders</h2>
-                <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.4em] mt-2">The Global NEXON Ecosystem</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="relative flex overflow-x-hidden">
-            <div className="animate-marquee whitespace-nowrap flex items-center">
-              {[...clients, ...clients].map((client, i) => (
-                <div key={i} className="mx-12 grayscale opacity-30 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
-                  <img 
-                    src={client.logoUrl} 
-                    alt={client.name} 
-                    className="h-12 md:h-16 w-auto object-contain"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+
 
       {/* Final CTA */}
       <section className="py-56 bg-[#131313] relative overflow-hidden text-center">

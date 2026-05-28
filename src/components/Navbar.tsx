@@ -41,6 +41,7 @@ export default function Navbar({ settings }: { settings: any }) {
           <img 
             src={logoAsset} 
             alt="NEXON" 
+            referrerPolicy="no-referrer"
             className="h-12 w-auto transition-all duration-500 group-hover:scale-110"
           />
           <span className="text-xl font-black text-white tracking-tighter hidden sm:block">

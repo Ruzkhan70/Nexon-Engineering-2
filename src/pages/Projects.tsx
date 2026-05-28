@@ -186,6 +186,7 @@ export default function Projects() {
                   <img 
                     src={project.imageUrl || project.image} 
                     alt={project.title} 
+                    referrerPolicy="no-referrer"
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-40 group-hover:opacity-70"
                   />
                   

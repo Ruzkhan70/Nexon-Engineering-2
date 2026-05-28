@@ -385,6 +385,7 @@ export default function About() {
                     src={teamImage} 
                     alt="Nexon Engineering Team" 
                     draggable="false"
+                    referrerPolicy="no-referrer"
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 select-none"
                   />
                 </div>
