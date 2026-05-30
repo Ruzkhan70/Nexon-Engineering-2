@@ -44,10 +44,10 @@ export default function InteractiveDotGrid() {
       canvas.height = height;
       
       const isMobile = window.innerWidth < 768;
-      particleCount = isMobile ? 80 : 380;
-      connectionDist = isMobile ? 120 : 280;
-      repulsionDist = isMobile ? 100 : 240;
-      gridSpacing = isMobile ? 60 : 35;
+      particleCount = isMobile ? 150 : 380;
+      connectionDist = isMobile ? 150 : 280;
+      repulsionDist = isMobile ? 120 : 240;
+      gridSpacing = isMobile ? 45 : 35;
       
       // Static background grid
       backgroundDots = [];
