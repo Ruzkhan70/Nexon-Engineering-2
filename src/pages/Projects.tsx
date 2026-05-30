@@ -141,6 +141,10 @@ export default function Projects() {
                   </button>
                 ))}
              </div>
+             <div className="flex md:hidden items-center justify-end w-full gap-2 mt-2 pr-4 text-white/40 text-[10px] uppercase tracking-widest animate-pulse">
+                <span>Swipe to explore</span>
+                <span>&rarr;</span>
+             </div>
              
            <div className="flex items-center gap-6 font-mono text-[10px] text-white/20 uppercase tracking-[0.3em]">
                 <div className="flex items-center gap-2">

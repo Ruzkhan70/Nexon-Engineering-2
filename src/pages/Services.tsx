@@ -153,7 +153,7 @@ export default function Services() {
           </div>
         ) : (
           <>
-            <div className="sticky top-28 z-50 mb-20 flex justify-center w-full px-4 md:px-0">
+            <div className="sticky top-28 z-50 mb-20 flex flex-col items-center w-full px-4 md:px-0">
               <nav className="bg-[#0A0F1E]/95 backdrop-blur-3xl p-3 md:p-4 rounded-[32px] md:rounded-[40px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_20px_rgba(30,136,229,0.1)] flex overflow-x-auto md:flex-wrap justify-start md:justify-center items-center gap-3 w-full max-w-full md:max-w-5xl px-4 md:px-8 min-h-[80px] no-scrollbar">
                 <button
                   onClick={() => setActiveCategory('all')}
@@ -190,6 +190,10 @@ export default function Services() {
                   </button>
                 ))}
               </nav>
+              <div className="flex md:hidden items-center gap-2 mt-4 text-white/40 text-[10px] uppercase tracking-widest animate-pulse">
+                <span>Swipe to explore</span>
+                <span>&rarr;</span>
+              </div>
             </div>
             {/* Services Grid */}
             <div className="min-h-[500px]">
