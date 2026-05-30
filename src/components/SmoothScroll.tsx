@@ -7,7 +7,16 @@ export default function SmoothScroll() {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    // Initialize Lenis once
+    // Determine if device is mobile or touch
+    const isMobile = window.innerWidth < 768 || ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+
+    if (isMobile) {
+      // Mobile native scrolling fallback - no Lenis
+      window.scrollToTop = () => window.scrollTo(0, 0);
+      return;
+    }
+
+    // Initialize Lenis once for desktop only
     const lenis = new Lenis({
       duration: 1.5,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -15,7 +24,6 @@ export default function SmoothScroll() {
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1.1,
-      touchMultiplier: 1.5,
       infinite: false,
     });
 
@@ -74,6 +82,13 @@ export default function SmoothScroll() {
         lenisRef.current?.scrollTo(0, { immediate: true });
       }, 100);
 
+      return () => clearTimeout(timeoutId);
+    } else {
+      // Native mobile fallback for route changes
+      window.scrollTo(0, 0);
+      const timeoutId = setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 100);
       return () => clearTimeout(timeoutId);
     }
   }, [pathname]);
