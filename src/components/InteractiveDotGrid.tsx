@@ -16,11 +16,11 @@ export default function InteractiveDotGrid() {
     let height = 0;
     let backgroundDots: { x: number; y: number }[] = [];
     let particles: { x: number; y: number; vx: number; vy: number; size: number; baseAlpha: number; originX: number; originY: number }[] = [];
-    const particleCount = 380; // Significantly more particles for denser lines
-    const connectionDist = 280; // Increased for even denser connectivity
-    const repulsionDist = 240; 
+    let particleCount = 380; 
+    let connectionDist = 280; 
+    let repulsionDist = 240; 
+    let gridSpacing = 35; 
     const mouse = { x: -1000, y: -1000 };
-    const gridSpacing = 35; // Closer grid points for more detail
 
     const createParticle = (x: number, y: number, isBurst = false) => {
       const sx = (Math.random() - 0.5) * (isBurst ? 5 : 2.5); // Increased speed
@@ -42,6 +42,12 @@ export default function InteractiveDotGrid() {
       height = container.offsetHeight;
       canvas.width = width;
       canvas.height = height;
+      
+      const isMobile = window.innerWidth < 768;
+      particleCount = isMobile ? 80 : 380;
+      connectionDist = isMobile ? 120 : 280;
+      repulsionDist = isMobile ? 100 : 240;
+      gridSpacing = isMobile ? 60 : 35;
       
       // Static background grid
       backgroundDots = [];
