@@ -153,8 +153,8 @@ export default function Services() {
           </div>
         ) : (
           <>
-            <div className="sticky top-28 z-50 mb-20 flex justify-center w-full">
-              <nav className="bg-[#0A0F1E]/95 backdrop-blur-3xl p-3 md:p-4 rounded-[32px] md:rounded-[40px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_20px_rgba(30,136,229,0.1)] flex flex-wrap justify-center items-center gap-3 max-w-[95vw] md:max-w-5xl px-6 md:px-8 min-h-[80px]">
+            <div className="sticky top-28 z-50 mb-20 flex justify-center w-full px-4 md:px-0">
+              <nav className="bg-[#0A0F1E]/95 backdrop-blur-3xl p-3 md:p-4 rounded-[32px] md:rounded-[40px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_20px_rgba(30,136,229,0.1)] flex overflow-x-auto md:flex-wrap justify-start md:justify-center items-center gap-3 w-full max-w-full md:max-w-5xl px-4 md:px-8 min-h-[80px] no-scrollbar">
                 <button
                   onClick={() => setActiveCategory('all')}
                   className="relative px-6 md:px-8 py-3.5 md:py-4 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all z-10 cursor-pointer group flex-shrink-0"

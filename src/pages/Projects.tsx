@@ -121,12 +121,12 @@ export default function Projects() {
             </div>
           ) : (
             <div className="flex flex-col items-center md:items-end gap-8">
-             <div className="flex flex-wrap justify-center md:justify-end gap-3 p-1.5 glass-morphism rounded-[24px]">
+             <div className="flex overflow-x-auto md:flex-wrap justify-start md:justify-end gap-3 p-1.5 glass-morphism rounded-[24px] w-full max-w-[95vw] md:max-w-none no-scrollbar">
                 {filterOptions.map((catId) => (
                   <button
                     key={catId}
                     onClick={() => setFilter(catId)}
-                    className={`relative px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                    className={`relative px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex-shrink-0 ${
                       filter === catId ? 'text-white' : 'text-white/30 hover:text-white/60'
                     }`}
                   >
