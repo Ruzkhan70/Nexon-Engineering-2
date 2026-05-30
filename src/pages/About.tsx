@@ -131,7 +131,7 @@ export default function About() {
               <motion.h1 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-5xl md:text-8xl lg:text-9xl font-black text-white tracking-widest leading-none uppercase italic"
+                className="text-4xl sm:text-5xl md:text-8xl lg:text-9xl font-black text-white tracking-tight sm:tracking-widest leading-none uppercase italic pr-4 md:pr-8"
               >
                 NEXON
               </motion.h1>
@@ -140,7 +140,7 @@ export default function About() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-5xl md:text-8xl lg:text-9xl font-black text-[#1E88E5] tracking-widest leading-none uppercase italic italic-outline-white"
+                className="text-4xl sm:text-5xl md:text-8xl lg:text-9xl font-black text-[#1E88E5] tracking-tight sm:tracking-widest leading-none uppercase italic italic-outline-white pr-4 md:pr-8"
               >
                 ENGINEERING
               </motion.h1>
