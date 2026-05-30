@@ -82,7 +82,8 @@ export default function Clients() {
                 key={client.id || idx}
                 onClick={() => {
                   if (client.websiteUrl) {
-                    window.open(client.websiteUrl, '_blank', 'noopener,noreferrer');
+                    const url = client.websiteUrl.startsWith('http') ? client.websiteUrl : `https://${client.websiteUrl}`;
+                    window.open(url, '_blank', 'noopener,noreferrer');
                   }
                 }}
                 initial={{ opacity: 0, y: 30 }}
