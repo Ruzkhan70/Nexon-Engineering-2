@@ -458,7 +458,7 @@ export default function Home() {
             {(siteSettings?.heroTitle || "Engineering innovation with precision").split(' ').map((word: string, i: number) => (
               <span 
                 key={i} 
-                className={`inline-block pr-2 ${['engineering', 'innovation', 'precision'].includes(word.toLowerCase()) 
+                className={`inline-block pr-4 sm:pr-6 md:pr-8 ${['nexon', 'engineering', 'innovation', 'precision'].includes(word.toLowerCase()) 
                   ? 'text-transparent bg-clip-text bg-gradient-to-r from-white via-[#00b4d8] to-[#1E88E5] drop-shadow-[0_0_20px_rgba(30,136,229,0.3)]' 
                   : ''
                 }`}
@@ -695,7 +695,7 @@ export default function Home() {
                 <span className="text-[#1E88E5] font-black tracking-[0.4em] uppercase text-[10px]">Registry: NXN-SRL-01</span>
                 <div className="flex-grow h-[1px] bg-[#0A2463]/10" />
               </div>
-              <h2 className="text-4xl sm:text-5xl md:text-8xl font-black leading-[0.85] tracking-tighter text-[#131313] uppercase italic">{siteSettings?.aboutTitle || "Built on Trust."}</h2>
+              <h2 className="text-4xl sm:text-5xl md:text-8xl font-black leading-[0.85] tracking-tighter text-[#131313] uppercase italic pr-4 md:pr-8">{siteSettings?.aboutTitle || "Built on Trust."}</h2>
             </div>
             
             <p className="text-lg md:text-xl text-[#0A2463]/70 font-medium leading-relaxed italic pr-0 md:pr-12">
@@ -835,7 +835,7 @@ export default function Home() {
               <Zap className="text-royal" size={40} />
             </div>
             <h2 className="text-4xl sm:text-5xl md:text-9xl font-black text-white leading-[0.8] tracking-tighter uppercase italic pr-4">
-              Initiate your <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00b4d8] to-royal">Engineering Project</span>
+              Initiate your <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00b4d8] to-royal pr-4 md:pr-8">Engineering Project</span>
             </h2>
             <p className="text-white/40 text-xl md:text-2xl max-w-2xl mx-auto font-medium italic border-b border-royal/20 pb-12">
               Deploy Nexon expertise to your facility today. Consult with our engineers for an industrial-grade solution.

@@ -275,7 +275,7 @@ export default function About() {
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div>
               <span className="text-[#1E88E5] font-black tracking-[0.4em] uppercase text-[10px] mb-4 block">Operational Domains</span>
-              <h2 className="text-5xl md:text-7xl font-black text-white tracking-widest leading-none uppercase italic mb-8">
+              <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter md:tracking-widest leading-none uppercase italic mb-8 pr-4">
                 {siteSettings.aboutTechnicalTitle.split(' ').map((word, i) => (
                   i === siteSettings.aboutTechnicalTitle.split(' ').length - 1 
                     ? <span key={i} className="text-[#1E88E5] block italic italic-outline-white">{word}</span>
@@ -351,7 +351,7 @@ export default function About() {
                     <span className="text-[#1E88E5] font-black text-xs tracking-widest">EST. 2017</span>
                     <div className="h-[1px] flex-grow bg-white/10" />
                   </div>
-                  <h2 className="text-7xl md:text-8xl font-black text-white leading-[0.8] tracking-widest uppercase italic">{String(siteSettings.statYears).padStart(2, '0')} Years of <br /><span className="text-[#1E88E5] italic italic-outline-white">Evolution</span></h2>
+                  <h2 className="text-5xl sm:text-6xl md:text-8xl font-black text-white leading-[0.8] tracking-tighter md:tracking-widest uppercase italic pr-4 md:pr-8">{String(siteSettings.statYears).padStart(2, '0')} Years of <br /><span className="text-[#1E88E5] italic italic-outline-white pr-4">Evolution</span></h2>
                </div>
 
                <p className="text-white/50 text-2xl font-medium leading-relaxed">
