@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { db } from './lib/firebase';
@@ -17,16 +17,24 @@ import SmoothScroll from './components/SmoothScroll';
 import LoadingScreen from './components/LoadingScreen';
 import './index.css';
 
-function AppContent({ settings, loading }: { settings: any, loading: boolean }) {
+function AppContent({
+  settings,
+  loading,
+  onAnimationComplete,
+}: {
+  settings: any;
+  loading: boolean;
+  onAnimationComplete: () => void;
+}) {
   const location = useLocation();
 
   return (
     <>
       <SmoothScroll />
       <AnimatePresence mode="wait">
-        {loading && <LoadingScreen key="loader" />}
+        {loading && <LoadingScreen key="loader" onComplete={onAnimationComplete} />}
       </AnimatePresence>
-      
+
       <div className="min-h-screen flex flex-col bg-[#020917] text-[#F8F9FA] font-sans selection:bg-[#1E88E5] selection:text-white overflow-x-hidden w-full max-w-[100vw]">
         {!loading && (
           <div className="flex flex-col min-h-screen">
@@ -62,38 +70,54 @@ function AppContent({ settings, loading }: { settings: any, loading: boolean }) 
 }
 
 export default function App() {
-  const [settings, setSettings] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [timedOut, setTimedOut] = useState(false);
+  const [settings, setSettings]       = useState<any>(null);
+  const [loading, setLoading]         = useState(true);
+  const [timedOut, setTimedOut]       = useState(false);
 
-  const loadingRef = useRef(true);
+  // Two independent gates — site only shows when BOTH are true
+  const dataReadyRef      = useRef(false);
+  const animationDoneRef  = useRef(false);
+
+  /** Try to dismiss loading — only succeeds when both gates are open */
+  const tryDismiss = useCallback(() => {
+    if (dataReadyRef.current && animationDoneRef.current) {
+      setLoading(false);
+    }
+  }, []);
+
+  /** Called by LoadingScreen when progress bar hits 100% */
+  const handleAnimationComplete = useCallback(() => {
+    animationDoneRef.current = true;
+    tryDismiss();
+  }, [tryDismiss]);
 
   useEffect(() => {
     // High-level settings sync
-    const unsub = onSnapshot(doc(db, 'settings', 'global'), (doc) => {
-      if (doc.exists()) {
-        setSettings(doc.data());
+    const unsub = onSnapshot(doc(db, 'settings', 'global'), (snap) => {
+      if (snap.exists()) {
+        setSettings(snap.data());
       }
-      setLoading(false);
-      loadingRef.current = false;
+      dataReadyRef.current = true;
+      tryDismiss();
     }, (error) => {
       console.warn("Initial settings sync restricted, initializing system shell.");
-      setLoading(false);
-      loadingRef.current = false;
+      dataReadyRef.current = true;
+      tryDismiss();
     });
 
-    // Safety timeout: Ensure loading finishes after 4s no matter what
+    // Safety timeout: If Firebase never responds, open the data gate after 10s
+    // (animation gate still controls minimum duration)
     const safetyTimeout = setTimeout(() => {
-      if (loadingRef.current) {
+      if (!dataReadyRef.current) {
         console.log("Safety synchronization engaged.");
-        setLoading(false);
-        loadingRef.current = false;
+        dataReadyRef.current = true;
+        tryDismiss();
       }
-    }, 4000);
-    
-    // Hard failure timeout: Only show error if we are STILL loading after 15s
+    }, 10000);
+
+    // Hard failure timeout: Only show error if STILL loading after 15s
     const failureTimeout = setTimeout(() => {
-      if (loadingRef.current) {
+      if (loading) {
         setTimedOut(true);
       }
     }, 15000);
@@ -103,6 +127,7 @@ export default function App() {
       clearTimeout(safetyTimeout);
       clearTimeout(failureTimeout);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (timedOut) {
@@ -111,7 +136,11 @@ export default function App() {
 
   return (
     <Router>
-      <AppContent settings={settings} loading={loading && !timedOut} />
+      <AppContent
+        settings={settings}
+        loading={loading && !timedOut}
+        onAnimationComplete={handleAnimationComplete}
+      />
     </Router>
   );
 }
