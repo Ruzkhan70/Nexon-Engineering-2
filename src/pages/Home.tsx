@@ -835,7 +835,7 @@ export default function Home() {
               <Zap className="text-royal" size={40} />
             </div>
             <h2 className="text-4xl sm:text-5xl md:text-9xl font-black text-white leading-[0.8] tracking-tighter uppercase italic pr-4">
-              Initiate your <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00b4d8] to-royal pr-4 md:pr-8">Engineering Project</span>
+              Initiate your <br /><span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#00b4d8] to-royal pr-6 md:pr-10">Engineering Project</span>
             </h2>
             <p className="text-white/40 text-xl md:text-2xl max-w-2xl mx-auto font-medium italic border-b border-royal/20 pb-12">
               Deploy Nexon expertise to your facility today. Consult with our engineers for an industrial-grade solution.

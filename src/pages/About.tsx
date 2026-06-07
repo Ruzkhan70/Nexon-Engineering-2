@@ -344,14 +344,14 @@ export default function About() {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-20" />
         
         <div className="max-w-7xl mx-auto px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-32 items-center">
-            <div className="space-y-12">
+          <div className="grid lg:grid-cols-2 gap-16 lg:gap-32 items-center">
+            <div className="space-y-12 relative z-20">
                <div>
                   <div className="flex items-center gap-4 mb-4">
                     <span className="text-[#1E88E5] font-black text-xs tracking-widest">EST. 2017</span>
                     <div className="h-[1px] flex-grow bg-white/10" />
                   </div>
-                  <h2 className="text-5xl sm:text-6xl md:text-8xl font-black text-white leading-[0.8] tracking-tighter md:tracking-widest uppercase italic pr-4 md:pr-8">{String(siteSettings.statYears).padStart(2, '0')} Years of <br /><span className="text-[#1E88E5] italic italic-outline-white pr-4">Evolution</span></h2>
+                  <h2 className="text-5xl sm:text-6xl lg:text-8xl font-black text-white leading-[0.8] tracking-tighter uppercase italic pr-4 md:pr-8">{String(siteSettings.statYears).padStart(2, '0')} Years of <br /><span className="inline-block text-[#1E88E5] italic italic-outline-white pr-6 md:pr-10">Evolution</span></h2>
                </div>
 
                <p className="text-white/50 text-2xl font-medium leading-relaxed">
